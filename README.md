@@ -18,6 +18,6 @@ A sample pinterest data was provided by the bootcamp. The data consists of three
 
 ### Batch-processing
 
-| ![batch processing architecture](/images/batch processing architecture.jpg) |
+| ![batch processing architecture](/images/batch_processing_ architecture.jpg) |
 | :------------------------------------------------: |
 | batch processing architecture                               |
