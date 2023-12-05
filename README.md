@@ -15,3 +15,9 @@ A sample pinterest data was provided by the bootcamp. The data consists of three
 | ![processed dataframe schema](/images/processed_df_schema.jpg) |
 | :------------------------------------------------: |
 | processed dataframe schema                               |
+
+### Batch-processing
+
+| ![batch processing architecture](/images/batch processing architecture.jpg) |
+| :------------------------------------------------: |
+| batch processing architecture                               |
