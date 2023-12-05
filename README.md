@@ -1,3 +1,3 @@
-# Table of Contents
+# Pinterest Data Pipeline
 
-## Introduction
+This project, developed as part of the **AI Core** Data Engineering Bootcamp, showcases the creation of two distinct data pipelines: a **batch-processing** data pipeline and a **stream-processing** data pipeline. The project utilizes a range of different AWS services like **API Gateway**, **Managed services for kafka (MSK)**, **S3**, **Databricks (Spark)** etc to demonstrate data ingestion, transformation and storage for the pipelines. The pipelines handled sample pinterest data provided by the bootcamp to produce **query-ready** data at the end of the pipeline. This project servers as both a practical learning opportunity in various data engineering practices and technologies, and as a possible reference for those exploring the field.
