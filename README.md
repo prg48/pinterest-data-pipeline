@@ -6,10 +6,12 @@ This project, developed as part of the **AI Core** Data Engineering Bootcamp, sh
 
 ### Data
 
-A sample pinterest data was provided by the bootcamp. The data consists of three main datasets: **pin**, **geo** and **user**. The data is hosted on RDS and was accessed with the credentials provided by the bootcamp. The raw dataframe schema for the data is provided in the image below:
+A sample pinterest data was provided by the bootcamp. The data consists of three main datasets: **pin**, **geo** and **user**. Hosted on RDS, the data was accessed using credentials supplied by the bootcamp. The same dataset was used for both the **batch** and **stream** data pipelines. Below are the dataframe schemas for the raw and processed dataframes.
 
 | ![raw dataframe schema](/images/raw_df_schema.jpg) |
 | :------------------------------------------------: |
 | raw dataframe schema                               |
 
-
+| ![processed dataframe schema](/images/processed_df_schema.jpg) |
+| :------------------------------------------------: |
+| processed dataframe schema                               |
