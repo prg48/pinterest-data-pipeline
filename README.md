@@ -18,6 +18,14 @@ A sample pinterest data was provided by the bootcamp. The data consists of three
 
 ### Batch-processing
 
+The batch processing architecture in the project consists of a number of different layers, each playing a crucial role in the data processing lifecycle: 
+* **producer or data source**: This is the origin of the data. It emulates as a data source that generates the data we need to process. This is the source that produces the above mentioned **pin**, **geo** and **user** data.
+* **ingestion**: This layer is responsible for ingesting data produced by the source. It ensures that data is reliably captured and made available for processing.
+* **MWAA orchestration**: This layer orchestrates the processing of data, managing the workflow and ensuring that data processing tasks are executed in the correct order and manner.
+* **storage**: This layer stores the data in various stages of the pipeline, accomodating both raw and processed data.
+
+Below is the architecture diagram for the **batch processing** system:
+
 | ![batch processing architecture](/images/batch_processing_architecture.jpg) |
 | :------------------------------------------------: |
 | batch processing architecture                               |
