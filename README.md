@@ -29,3 +29,38 @@ Below is the architecture diagram for the **batch processing** system:
 | ![batch processing architecture](/images/batch_processing_architecture.jpg) |
 | :------------------------------------------------: |
 | batch processing architecture                               |
+
+#### Producer
+
+The producer emulates a data source generates data. The data is sourced from an external RDS database provided by the bootcamp. The [user_posting_emulation.py](batch_processing/user_posting_emulation.py) script is responsible for loading **pin**, **geo**, and **user** data from the database. It then prepares this data for transmission to the **ingestion layer**, the **API Gateway**.
+
+* Preparing data for transmission
+To send data to the API Gateway, it must be formatted as a specific JSON payload structure expected by the **kafka client (kafka REST proxy)** endpoint. The **create_post_payload** function in the script handles this formatting.
+
+* Payload format
+The API expects a JSON object with a key "records", which is an array of objects. Each object in this array has a key "value" that contains the actual data as a dictionary. The structure looks like this:
+
+```json
+{
+    "records": [
+        {
+            "value": {
+                // Data to be sent
+            }
+        }
+        // ... more records
+    ]
+}
+```
+
+* Function Overview:
+***create_post_payload*** takes a dictionary representing the data and returns a JSON string in the required format. It uses json.dumps for serialization, with a custom json_serial function to handle non-serializable types like datetime. This ensures the data is correctly formatted as per the API's requirements.
+
+Example usage:
+
+```python
+data_to_send = {"key1": "value1", "key2": "value2"}
+payload = create_post_payload(data_to_send)
+```
+
+This process ensures that the data is correctly prepared and transmitted for further processing in the pipeline.
