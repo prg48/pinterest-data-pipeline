@@ -88,10 +88,10 @@ The orchestration process is implemented in **Airflow**, with the detailed imple
 
 Within this orchestration framework, four key notebooks hosted in **Databricks** leverage the **Spark** processing framework:
 
-    1. **clean_data_from_S3_and_save_as_delta_tables** : 
+    * **clean_data_from_S3_and_save_as_delta_tables** : 
     Initiated by the **clean_data_from_S3_and_save_as_delta_tables** task in MWAA, this notebook loads data from the **Topics bucket**, transforms it into **delta format**, and stores the transformed data in the **Raw delta tables bucket**. The implementation is found in [load_data_from_S3_and_save_as_delta_tables.ipynb](/batch_processing/databricks_transformation_notebooks/load_data_from_S3_and_save_as_delta_tables.ipynb).
 
-    2. **clean_df_geo**:
+    * **clean_df_geo**:
     Triggered by the **clean_geo_data_and_save_as_delta_table** task in MWAA, this notebook processes **geo** data from the **Raw delta tables bucket**. The transformations include:
         * Combining latitude and longitude into a single struct column.
         * Converting the timestamp column to the timestamp data type.
@@ -99,7 +99,7 @@ Within this orchestration framework, four key notebooks hosted in **Databricks**
 
     The transformed data is then saved in the **Transformed delta tables bucket** under the **geo** sub-bucket. See [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb) for details.
 
-    3. **clean_df_pin**:
+    * **clean_df_pin**:
     The **clean_pin_data_and_save_as_delta_table** task in MWAA initiates this notebook to transform **pin** data. Key transformations include:
         * Replacing empty strings and irrelevant values with null.
         * Converting the follower_count column from numerical abbreviation to numeric string form, then to an integer.
@@ -107,7 +107,7 @@ Within this orchestration framework, four key notebooks hosted in **Databricks**
 
     Post-transformation, data is stored in the **Transformed delta tables bucket** under the **pin** sub-bucket. Implementation details are in [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb).
 
-    4. **clean_df_user**:
+    * **clean_df_user**:
     Initiated by the **clean_user_data_and_save_as_delta_table** task, this notebook processes **user** data with transformations such as:
         * Merging first_name and last_name into a new column, user_name.
         * Dropping the original first_name and last_name columns.
