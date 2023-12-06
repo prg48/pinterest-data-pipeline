@@ -32,7 +32,7 @@ Below is the architecture diagram for the **batch processing** system:
 
 #### Producer
 
-The producer emulates a data source generates data. The data is sourced from an external RDS database provided by the bootcamp. The [user_posting_emulation.py](batch_processing/user_posting_emulation.py) script is responsible with loading **pin**, **geo**, and **user** data from the database. It then prepares this data for transmission to the **ingestion layer** entrypoint, the **API Gateway**.
+The producer emulates a data source that generates data. The data is sourced from an external RDS database provided by the bootcamp. The [user_posting_emulation.py](batch_processing/user_posting_emulation.py) script is responsible with loading **pin**, **geo**, and **user** data from the database. It then prepares this data for transmission to the **ingestion layer** entrypoint, the **API Gateway**.
 
 * **Preparing data for transmission**:
 To send data to the API Gateway, it must be formatted as a specific JSON payload structure expected by the **Kafka client (Kafka REST proxy)** endpoint. The **create_post_payload(data)** function in the script formats the data as expected by the [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html) to post **data (records)** to **kafka cluster (MSK)** topics. 
@@ -43,8 +43,21 @@ The ingestion layer is responsible for making sure that the data is reliably cap
 
 * **API Gateway**: 
 The API Gateway serves as the entrypoint for the ingestion layer. Its primary function is to enable the **producer** (described in the previous section) to send a POST request with a **data (record) payload**. This request is made through an API call, intended to forward the data to our **Kafka cluster (MSK)** service.
+
 To facilitate this, we set up a [proxy resource](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html) within the API Gateway. This proxy resource is designed to route all API calls from the **producer** directly to the **Kafka client (Kafka REST proxy)**. The Kafka client then handles these requests, ensuring that the records are appropriately posted to topics within the **Kafka cluster (MSK)**. 
+
+* **Kafka client (Kafka REST proxy)**:
+The Kafka client, hosted on an **EC2 instance**, serves two primary functions in our ingestion layer:
+
+1. **Topic Creation in kafka Cluster (MSK)**:
+The first responsibility of the Kafka client is to establish the necessary topic on the **Kafka cluster (MSK)**. These topics correspond to the **pin**, **geo**, and **user** data sets. To achieve this, [Kafka was installed on the EC2 instance and relevant topics created](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html) within the **Kafka cluster (MSK)**, setting the foundation for data categorization and management.
+
+2. **Handling API Gateway requests**:
+The second key role of the Kafka client is to process requests received from the **API Gateway**. For this purpose, The [Confluent package, which includes the Kafka REST functionality, was installed](https://packages.confluent.io/archive/7.2/) on the EC2 instance. This setup was [configured to connect to our Kafka cluster (MSK)](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9), enabling the Kafka client to handle incoming requests effectively. This configuration ensures that the Kafka client can receive and process data payloads forwarded by the **API Gateway**, facilitating seamless data flow into the Kafka topics.
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
 * [Setup a proxy integration with a proxy resource in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html)
+* [Install kafka on a client machine and create a topics on MSK cluster](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html)
+* [Download confluent package containing Kafka REST proxy](https://packages.confluent.io/archive/7.2/)
+* [Configure Kafka REST proxy to connect to MSK](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9)
