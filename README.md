@@ -19,16 +19,16 @@ A sample pinterest data was provided by the bootcamp. The data consists of three
 ### Batch-processing
 
 The batch processing architecture in the project consists of a number of different layers, each playing a crucial role in the data processing lifecycle: 
-* **producer or data source**: This is the origin of the data. It emulates as a data source that generates the data we need to process. This is the source that produces the above mentioned **pin**, **geo** and **user** data.
-* **ingestion**: This layer is responsible for ingesting data produced by the source. It ensures that data is reliably captured and made available for processing.
+* **Producer/Data Source**: This is the origin of the data. It emulates as a data source that generates the data we need to process. This is the source that produces the above mentioned **pin**, **geo** and **user** data.
+* **Ingestion**: This layer is responsible for ingesting data produced by the source. It ensures that data is reliably captured and made available for processing.
 * **MWAA orchestration**: This layer orchestrates the processing of data, managing the workflow and ensuring that data processing tasks are executed in the correct order and manner.
-* **storage**: This layer stores the data in various stages of the pipeline, accomodating both raw and processed data.
+* **Storage**: This layer stores the data in various stages of the pipeline, accomodating both raw and processed data.
 
-Below is the architecture diagram for the **batch processing** system:
+Below is the architecture diagram for the **batch-processing** data pipeline:
 
 | ![batch processing architecture](/images/batch_processing_architecture.jpg) |
 | :------------------------------------------------: |
-| batch processing architecture                               |
+| batch-processing data pipeline architecture                              |
 
 #### Producer
 
@@ -116,6 +116,19 @@ Initiated by the **clean_data_from_S3_and_save_as_delta_tables** task in MWAA, t
     The final output is saved in the **Transformed delta tables bucket** in the **user** sub-bucket. Refer to [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for the notebook.
 
 These notebooks are orchestrated in MWAA using the [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html). As depicted in the DAG graph, the **load_data_from_S3_and_save_it_as_delta_tables** task is executed first, followed by the parallel execution of the other transformation tasks.
+
+### Stream-processing
+The stream-processing pipeline in the project, while similar to the batch-processing pipeline, is specifically designed to handle real-time data flows. It utilizes the same datasets -**geo**, **pin**, and **user**- and is composed of several distinct layers, each playing a crucial role in the streaming lifecycle:
+* **producer**: serving as the data's origin, the producer in the stream-processing pipeline emulates a real-time data source. It continuously generates streaming data for **geo**, **pin**, and **user** datasets, simulating a live environment where data is consttantly being produced and collected.
+* **Ingestion**: This layer is the first point of contact for the streaming data. It is responsible for efficiently ingesting the data produced by the producer. Key in this layer is the ability to handle high-velocity data streams, ensuring that the data is captured accurately, ready for the next stages of processing.
+* **Databricks Spark Streaming**: At the heart of our stream-processing pipeline is the Databricks Spark Streaming layer. This layer leverages Apache Spark's capabilities to process streaming data in real time. It initiates a continuous data stream, applies necessary transformations to the incoming data, and prepares  it for storage. This step is crucial for converting raw streaming data into a format that is more suitable for analysis and querying.
+* **Storage**: The transformed, query-ready data is then stored in this layer in a format that is optimized for quick data retrieval.
+
+Below is the architecture diagram for the **stream-processing** data pipeline:
+
+| ![stream processing architecture](/images/stream_processing_architecture.jpg) |
+| :------------------------------------------------: |
+| stream-processing data pipeline architecture                              |
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
