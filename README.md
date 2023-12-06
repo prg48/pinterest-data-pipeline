@@ -65,6 +65,18 @@ The Kafka client, hosted on an **EC2 instance**, serves two primary functions in
 
     Through these mechanisms, the Kafka cluster (MSK) not only stores incoming data but also plays a pivotal role in the onward movement of data to S3, forming a crucial link in the data processing pipeline.
 
+#### Storage
+The storage layer in our pipeine plays a pivotal role in maintaining data accessibility and integrity. It is structured to store different types of data, each serving a specific purpose in the data lifecycle. It primarily handles three categories of data: 
+
+* **Topics bucket**:
+This bucket is a direct receipient of data from the **Kafka cluster (MSK)** via the **S3 sink connector**. It is organized into three sub-buckets: **geo**, **pin**, and **user**, corresponding to the different data we handle. The data in this bucket is in its raw form, stored as **JSON** files. This setup ensures that the initial, unprocessed data is preserved in its original state for any necessary reference or processing.
+
+* **Raw delta tables bucket**:
+The raw data from the Topic bucket undergoes an initial transformation and is stored in this bucket in the **delta table parquet** file format. This transformation is facilitated by [load_data_from_S3_and_save_as_delta_tables.ipynb](/batch_processing/databricks_transformation_notebooks/load_data_from_S3_and_save_as_delta_tables.ipynb) notebook in **Databricks**. Similar to the Topics bucket, it contains three sub-buckets for **geo**, **pin**, and **user** data. Storing data as delta tables in this manner enhances the efficiency and speed of data retrieval, making it a crucial step in our data management process.
+
+* **Transformed delta tables bucket**:
+This bucket is the final storage point for proecssed data. It contains data that has been further refined and transformed from the **Raw delta tables** bucket. The transformation processes are carried out by specific notebooks: [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb) for geo data, [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb) for pin data, and [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for user data. Post-transformation, the data is stored back in **delta table parquet** format, segregated into **geo**, **pin**, and **user** sub-buckets. This bucket is optimized for end-user queries, offering processed and query-ready data for various analytical purposes.
+
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
 * [Setup a proxy integration with a proxy resource in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html)
