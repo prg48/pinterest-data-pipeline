@@ -119,7 +119,7 @@ These notebooks are orchestrated in MWAA using the [DatabricksSubmitRunOperator]
 
 ### Stream-processing
 The stream-processing pipeline in the project, while similar to the batch-processing pipeline, is specifically designed to handle real-time data flows. It utilizes the same datasets -**geo**, **pin**, and **user**- and is composed of several distinct layers, each playing a crucial role in the streaming lifecycle:
-* **producer**: serving as the data's origin, the producer in the stream-processing pipeline emulates a real-time data source. It continuously generates streaming data for **geo**, **pin**, and **user** datasets, simulating a live environment where data is consttantly being produced and collected.
+* **Producer/Data Source**: serving as the data's origin, the producer in the stream-processing pipeline emulates a real-time data source. It continuously generates streaming data for **geo**, **pin**, and **user** datasets, simulating a live environment where data is consttantly being produced and collected.
 * **Ingestion**: This layer is the first point of contact for the streaming data. It is responsible for efficiently ingesting the data produced by the producer. Key in this layer is the ability to handle high-velocity data streams, ensuring that the data is captured accurately, ready for the next stages of processing.
 * **Databricks Spark Streaming**: At the heart of our stream-processing pipeline is the Databricks Spark Streaming layer. This layer leverages Apache Spark's capabilities to process streaming data in real time. It initiates a continuous data stream, applies necessary transformations to the incoming data, and prepares  it for storage. This step is crucial for converting raw streaming data into a format that is more suitable for analysis and querying.
 * **Storage**: The transformed, query-ready data is then stored in this layer in a format that is optimized for quick data retrieval.
@@ -129,6 +129,11 @@ Below is the architecture diagram for the **stream-processing** data pipeline:
 | ![stream processing architecture](/images/stream_processing_architecture.jpg) |
 | :------------------------------------------------: |
 | stream-processing data pipeline architecture                              |
+
+#### Producer
+In our stream-processing pipeline, the producer plays a crucial role by emulating a continuous data source. Similar to the batch-processing setup, the same data is sourced from an external RDS database provided by the bootcamp. The streaming data is handled by [user_posting_emulation_streaming.py](/stream_processing/user_posting_emulation_streaming.py) script, fetching **geo**, **pin**, and **user** data and streaming it to the **API Gateway** in the ingestion layer, one record at a time.
+
+* **Preparing data for transmission**: The **API Gateway** required the data to be formatted in a specific JSON payload structure, suitable for posting records to **Kinesis Data Streams**. This formatting is managed by **create_post_payload(data, partition_key)** function within our script. The function ensures that each data record is structured as per the guidelines outlined in the [Kinesis Data Streams API documentation](https://docs.aws.amazon.com/pdfs/kinesis/latest/APIReference/kinesis-api.pdf).
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
@@ -141,3 +146,4 @@ Below is the architecture diagram for the **stream-processing** data pipeline:
 * [Create a custom plugin to use custom connector](https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-plugin.html)
 * [Benefits of storing data in delta table format](https://medium.com/datalex/5-reasons-to-use-delta-lake-format-on-databricks-d9e76cf3e77d)
 * [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html)
+* [Kinesis Data Streams API documentation](https://docs.aws.amazon.com/pdfs/kinesis/latest/APIReference/kinesis-api.pdf)
