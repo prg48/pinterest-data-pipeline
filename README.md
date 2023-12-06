@@ -54,9 +54,20 @@ The Kafka client, hosted on an **EC2 instance**, serves two primary functions in
     2. **Handling API Gateway requests**:
     The second key role of the Kafka client is to process requests received from the **API Gateway**. For this purpose, The [Confluent package, which includes the Kafka REST functionality, was installed](https://packages.confluent.io/archive/7.2/) on the EC2 instance. This setup was [configured to connect to our Kafka cluster (MSK)](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9), enabling the Kafka client to handle incoming requests effectively. This configuration ensures that the Kafka client can receive and process data payloads forwarded by the **API Gateway**, facilitating seamless data flow into the Kafka topics.
 
+* **Kafka cluster (MSK)**:
+The Managed Streaming for Kafka (MSK) service, or simply the Kafka cluster, represents the final component of our ingestion layer. It serves as the repository for the topics corresponding to the **geo**, **pin**, and **user** data sets. The topics, created by the Kafka client, are where the data forwarded by the **API Gateway** through the **Kafka client (Kafka REST proxy)** is stored.
+A critical aspect of our data flow involves transferring this data to S3 for durable storage. To facilitate this, we implemented an **S3 sink connector**. This process involves several steps:
+    1. **S3 Sink connector Setup**:
+    We started by [downloading the S3 sink connector](https://www.confluent.io/hub/confluentinc/kafka-connect-s3) and storing it in our S3 bucket. This connector is essential for enabling the movement of data from Kafka topics to S3.
+    2. **Custom Connector and Plugin Creation**: Next, we created a [custom connector](https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect-connectors.html) and a [custom plugin](https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-plugin.html) using the S3 sink connector. This setup allows for seamless data transfer from our Kafka topics directly to designated S3 buckets, ensuring efficient and reliable data storage.
+Through these mechanisms, the Kafka cluster (MSK) not only stores incoming data but also plays a pivotal role in the onward movement of data to S3, forming a crucial link in the data processing pipeline.
+
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
 * [Setup a proxy integration with a proxy resource in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html)
 * [Install kafka on a client machine and create a topics on MSK cluster](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html)
 * [Download confluent package containing Kafka REST proxy](https://packages.confluent.io/archive/7.2/)
 * [Configure Kafka REST proxy to connect to MSK](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9)
+* [Download S3 sink connector](https://www.confluent.io/hub/confluentinc/kafka-connect-s3)
+* [Create a custom S3 sink connector](https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect-connectors.html)
+* [Create a custom plugin to use custom connector](https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-plugin.html)
