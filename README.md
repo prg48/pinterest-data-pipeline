@@ -78,20 +78,44 @@ The raw data from the Topic bucket undergoes an initial transformation and is st
 This bucket is the final storage point for proecssed data. It contains data that has been further refined and transformed from the **Raw delta tables** bucket. The transformation processes are carried out by specific notebooks: [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb) for geo data, [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb) for pin data, and [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for user data. Post-transformation, the data is stored back in **delta table parquet** format, segregated into **geo**, **pin**, and **user** sub-buckets. This bucket is optimized for end-user queries, offering processed and query-ready data for various analytical purposes.
 
 #### MWAA orchestration
-Managed workflow for Apache Airflow (MWAA) is the final layer in our data pipeline and is responsible for orchestrating the initial transformation from the **Topics bucket** as well as the final transformation of data from **Raw delta tables bucket**. 
+The Managed Workflow for Apache Airflow (MWAA) represents the final layer in our data pipeline, tasked with orchestrating both the initial and final transformations of data. It handles the transformation of data from the **Topics bucket** and subsequently from the **Raw delta tables bucket**.
 
-The orchestration is perfomed in **Airflow** and the dag graph for the orchestration can be seen in the figure below:
+The orchestration process is implemented in **Airflow**, with the detailed implementation available in [batch_processing_dag.py](/batch_processing/dags/batch_processing_dag.py) script. The DAG graph illustrating this orchestration is shown below:
 
 | ![Airflow dag graph for batch processing](/images/batch_processing_dag.png) |
 | :------------------------------------------------: |
 | Airflow dag graph for batch processing orchestration                            |
 
-There are four notebooks hosted and created in **Databricks**:
-    1. **[load_data_from_S3_and_save_as_delta_tables.ipynb](/batch_processing/databricks_transformation_notebooks/load_data_from_S3_and_save_as_delta_tables.ipynb)**: 
-    This notebook is responsible for loading the data form the **Topics bucket**, transforming it into **delta format** and then storing the transformed data into **Raw delta tables bucket**.
+Within this orchestration framework, four key notebooks hosted in **Databricks** leverage the **Spark** processing framework:
 
-    2. **[clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb)**:
-    This notebook is responsible for loading the **geo** 
+    1. **clean_data_from_S3_and_save_as_delta_tables** : 
+    Initiated by the **clean_data_from_S3_and_save_as_delta_tables** task in MWAA, this notebook loads data from the **Topics bucket**, transforms it into **delta format**, and stores the transformed data in the **Raw delta tables bucket**. The implementation is found in [load_data_from_S3_and_save_as_delta_tables.ipynb](/batch_processing/databricks_transformation_notebooks/load_data_from_S3_and_save_as_delta_tables.ipynb).
+
+    2. **clean_df_geo**:
+    Triggered by the **clean_geo_data_and_save_as_delta_table** task in MWAA, this notebook processes **geo** data from the **Raw delta tables bucket**. The transformations include:
+        * Combining latitude and longitude into a single struct column.
+        * Converting the timestamp column to the timestamp data type.
+        * Reordering columns
+
+    The transformed data is then saved in the **Transformed delta tables bucket** under the **geo** sub-bucket. See [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb) for details.
+
+    3. **clean_df_pin**:
+    The **clean_pin_data_and_save_as_delta_table** task in MWAA initiates this notebook to transform **pin** data. Key transformations include:
+        * Replacing empty strings and irrelevant values with null.
+        * Converting the follower_count column from numerical abbreviation to numeric string form, then to an integer.
+        * Renaming the index column to ind.
+
+    Post-transformation, data is stored in the **Transformed delta tables bucket** under the **pin** sub-bucket. Implementation details are in [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb).
+
+    4. **clean_df_user**:
+    Initiated by the **clean_user_data_and_save_as_delta_table** task, this notebook processes **user** data with transformations such as:
+        * Merging first_name and last_name into a new column, user_name.
+        * Dropping the original first_name and last_name columns.
+        * Converting the date_joined column to timestamp format.
+
+    The final output is saved in the **Transformed delta tables bucket** in the **user** sub-bucket. Refer to [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for the notebook.
+
+These notebooks are orchestrated in MWAA using the [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html). As depicted in the DAG graph, the **load_data_from_S3_and_save_it_as_delta_tables** task is executed first, followed by the parallel execution of the other transformation tasks.
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
@@ -103,3 +127,4 @@ There are four notebooks hosted and created in **Databricks**:
 * [Create a custom S3 sink connector](https://docs.aws.amazon.com/msk/latest/developerguide/msk-connect-connectors.html)
 * [Create a custom plugin to use custom connector](https://docs.aws.amazon.com/msk/latest/developerguide/mkc-create-plugin.html)
 * [Benefits of storing data in delta table format](https://medium.com/datalex/5-reasons-to-use-delta-lake-format-on-databricks-d9e76cf3e77d)
+* [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html)
