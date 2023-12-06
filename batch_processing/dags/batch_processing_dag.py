@@ -11,7 +11,7 @@ default_args = {
     'retry_delay': timedelta(minutes=1)
 }
 
-with DAG("0e3bbd435bfb_dag",
+with DAG("batch_processing_dag",
     start_date=datetime(year=2023, month=11, day=1),
     schedule_interval='@daily',
     catchup=False,
