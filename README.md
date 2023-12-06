@@ -92,28 +92,28 @@ Within this orchestration framework, four key notebooks hosted in **Databricks**
 Initiated by the **clean_data_from_S3_and_save_as_delta_tables** task in MWAA, this notebook loads data from the **Topics bucket**, transforms it into **delta format**, and stores the transformed data in the **Raw delta tables bucket**. The implementation is found in [load_data_from_S3_and_save_as_delta_tables.ipynb](/batch_processing/databricks_transformation_notebooks/load_data_from_S3_and_save_as_delta_tables.ipynb).
 
 * **clean_df_geo**:
-Triggered by the **clean_geo_data_and_save_as_delta_table** task in MWAA, this notebook processes **geo** data from the **Raw delta tables bucket**. The transformations include:
-    * Combining latitude and longitude into a single struct column.
-    * Converting the timestamp column to the timestamp data type.
-    * Reordering columns
+    Triggered by the **clean_geo_data_and_save_as_delta_table** task in MWAA, this notebook processes **geo** data from the **Raw delta tables bucket**. The transformations include:
+        * Combining latitude and longitude into a single struct column.
+        * Converting the timestamp column to the timestamp data type.
+        * Reordering columns
 
-The transformed data is then saved in the **Transformed delta tables bucket** under the **geo** sub-bucket. See [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb) for details.
+    The transformed data is then saved in the **Transformed delta tables bucket** under the **geo** sub-bucket. See [clean_df_geo.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_geo.ipynb) for details.
 
 * **clean_df_pin**:
-The **clean_pin_data_and_save_as_delta_table** task in MWAA initiates this notebook to transform **pin** data. Key transformations include:
-    * Replacing empty strings and irrelevant values with null.
-    * Converting the follower_count column from numerical abbreviation to numeric string form, then to an integer.
-    * Renaming the index column to ind.
+    The **clean_pin_data_and_save_as_delta_table** task in MWAA initiates this notebook to transform **pin** data. Key transformations include:
+        * Replacing empty strings and irrelevant values with null.
+        * Converting the follower_count column from numerical abbreviation to numeric string form, then to an integer.
+        * Renaming the index column to ind.
 
-Post-transformation, data is stored in the **Transformed delta tables bucket** under the **pin** sub-bucket. Implementation details are in [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb).
+    Post-transformation, data is stored in the **Transformed delta tables bucket** under the **pin** sub-bucket. Implementation details are in [clean_df_pin.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_pin.ipynb).
 
 * **clean_df_user**:
-Initiated by the **clean_user_data_and_save_as_delta_table** task, this notebook processes **user** data with transformations such as:
-    * Merging first_name and last_name into a new column, user_name.
-    * Dropping the original first_name and last_name columns.
-    * Converting the date_joined column to timestamp format.
+    Initiated by the **clean_user_data_and_save_as_delta_table** task, this notebook processes **user** data with transformations such as:
+        * Merging first_name and last_name into a new column, user_name.
+        * Dropping the original first_name and last_name columns.
+        * Converting the date_joined column to timestamp format.
 
-The final output is saved in the **Transformed delta tables bucket** in the **user** sub-bucket. Refer to [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for the notebook.
+    The final output is saved in the **Transformed delta tables bucket** in the **user** sub-bucket. Refer to [clean_df_user.ipynb](/batch_processing/databricks_transformation_notebooks/clean_df_user.ipynb) for the notebook.
 
 These notebooks are orchestrated in MWAA using the [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html). As depicted in the DAG graph, the **load_data_from_S3_and_save_it_as_delta_tables** task is executed first, followed by the parallel execution of the other transformation tasks.
 
