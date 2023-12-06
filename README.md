@@ -48,11 +48,11 @@ To facilitate this, we set up a [proxy resource](https://docs.aws.amazon.com/api
 * **Kafka client (Kafka REST proxy)**:
 The Kafka client, hosted on an **EC2 instance**, serves two primary functions in our ingestion layer:
 
-1. **Topic Creation in kafka Cluster (MSK)**:
-The first responsibility of the Kafka client is to establish the necessary topic on the **Kafka cluster (MSK)**. These topics correspond to the **pin**, **geo**, and **user** data sets. To achieve this, [Kafka was installed on the EC2 instance and relevant topics created](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html) within the **Kafka cluster (MSK)**, setting the foundation for data categorization and management.
+    1. **Topic Creation in kafka Cluster (MSK)**:
+    The first responsibility of the Kafka client is to establish the necessary topic on the **Kafka cluster (MSK)**. These topics correspond to the **pin**, **geo**, and **user** data sets. To achieve this, [Kafka was installed on the EC2 instance and relevant topics created](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html) within the **Kafka cluster (MSK)**, setting the foundation for data categorization and management.
 
-2. **Handling API Gateway requests**:
-The second key role of the Kafka client is to process requests received from the **API Gateway**. For this purpose, The [Confluent package, which includes the Kafka REST functionality, was installed](https://packages.confluent.io/archive/7.2/) on the EC2 instance. This setup was [configured to connect to our Kafka cluster (MSK)](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9), enabling the Kafka client to handle incoming requests effectively. This configuration ensures that the Kafka client can receive and process data payloads forwarded by the **API Gateway**, facilitating seamless data flow into the Kafka topics.
+    2. **Handling API Gateway requests**:
+    The second key role of the Kafka client is to process requests received from the **API Gateway**. For this purpose, The [Confluent package, which includes the Kafka REST functionality, was installed](https://packages.confluent.io/archive/7.2/) on the EC2 instance. This setup was [configured to connect to our Kafka cluster (MSK)](https://swetavkamal.medium.com/how-to-call-aws-msk-managed-streaming-kafka-with-rest-api-5111c55d9bd9), enabling the Kafka client to handle incoming requests effectively. This configuration ensures that the Kafka client can receive and process data payloads forwarded by the **API Gateway**, facilitating seamless data flow into the Kafka topics.
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
