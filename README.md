@@ -3,6 +3,22 @@
 This project, developed as part of the **AI Core** Data Engineering Bootcamp, showcases the creation of two distinct data pipelines: a **batch-processing** data pipeline and a **stream-processing** data pipeline. The project utilizes a range of different AWS services like **API Gateway**, **Managed services for kafka (MSK)**, **S3**, **Databricks (Spark)** etc to demonstrate data ingestion, transformation and storage for the pipelines. The pipelines handled sample pinterest data on a user account on AWS, both provided by the bootcamp to produce **query-ready** data at the end of the pipeline. This project serves as both a practical learning opportunity in various data engineering practices and technologies, and as a possible reference for those exploring the field.
 
 ## Table of Contents
+- [Data](#data)
+- [Batch-processing](#batch-processing)
+    - [Producer](#producer)
+    - [Ingestion](#ingestion)
+    - [Storage](#storage)
+    - [MWAA orchestration](#mwaa-orchestration)
+- [Stream-processing](#stream-processing)
+    - [Producer](#producer-1)
+    - [Ingestion](#ingestion-1)
+    - [Databricks spark processing & Storage](#databricks-spark-processing--storage)
+- [Queries](#queries)
+    - [Most popular category each year](#most-popular-category-each-year)
+    - [Most popular category for different age groups](#most-popular-category-for-different-age-groups)
+    - [Median follower count of users based on their joining year](#median-follower-count-of-users-based-on-their-joining-year)
+    - [Median follower count of users based on their joining year and age group](#median-follower-count-of-users-based-on-their-joining-year-and-age-group)
+- [References](#references)
 
 ### Data
 
@@ -301,7 +317,7 @@ results:
 | 2017      | 25-35     | 4000                  |
 | 2017      | 36-50     | 3000                  |
 
-## References
+### References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
 * [Setup a proxy integration with a proxy resource in API Gateway](https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-set-up-simple-proxy.html)
 * [Install kafka on a client machine and create a topics on MSK cluster](https://docs.aws.amazon.com/msk/latest/developerguide/create-topic.html)
