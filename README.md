@@ -136,11 +136,20 @@ In our stream-processing pipeline, the producer plays a crucial role by emulatin
 * **Preparing data for transmission**: The **API Gateway** requires the data to be formatted in a specific JSON payload structure, suitable for posting records to **Kinesis Data Streams**. This formatting is managed by **create_post_payload(data, partition_key)** function within our script. The function ensures that each data record is structured as per the guidelines outlined in the [Kinesis Data Streams API documentation](https://docs.aws.amazon.com/pdfs/kinesis/latest/APIReference/kinesis-api.pdf).
 
 #### Ingestion
-TThe ingestion layer plays a pivotal role in our stream-processing data pipeline, ensuring real-time data from the producer is reliably captured and made ready for further processing. This layer utilizes **two key AWS services**:
+The ingestion layer plays a pivotal role in our stream-processing data pipeline, ensuring real-time data from the producer is reliably captured and made ready for further processing. This layer utilizes **two key AWS services**:
 
 * **API Gateway**: Mirroring its role in the batch-processing pipeline, the API Gateway here acts as the primary entry point. Its main function is to serve as a conduit to the **Kinesis DataStreams**' REST API, where the streaming data is managed. To achieve this, we have configured the API Gateway to function as a [Kinesis proxy](https://docs.aws.amazon.com/apigateway/latest/developerguide/integrating-api-with-aws-services-kinesis.html). This setup includes various endpoints that facilitates operations such as **retrieving streams**, **deleting streams**, **posting records**, and **iterating over streams with shard iterators**.
 
 * **Kinesis DataStreams**: Kinesis DataStreams is where the streaming data, produced by the producer, is ultimately stored for subsequent processing. It receives data from the **API Gateway** and segregates it into three distinct streams: **geo**, **pin**, and **user**. Each stream corresponds to the different data from streamed by the producer, ensuring organized and efficient data handling.
+
+#### Databricks spark processing & Storage
+In the final layer of our stream-processing data pipeline, the transformation of data is efficiently handles in Databricks, leveraging the capabilities of **Spark Structured Streaming**. We utilize three distinct notebooks to process the data streams from **Kinesis DataStreams**. Each notebook is responsible for streaming, transforming, and subsequently storing the data:
+
+* [kinesis_geo_data_stream_processing.ipynb](/stream_processing/databricks_transformation_notebooks/kinesis_geo_data_stream_processing.ipynb) for the **geo** data stream.
+* [kinesis_pin_data_stream_processing.ipynb](/stream_processing/databricks_transformation_notebooks/kinesis_pin_data_stream_processing.ipynb) for the **pin** data stream,
+* [kinesis_user_data_stream_processing.ipynb](/stream_processing/databricks_transformation_notebooks/kinesis_user_data_stream_processing.ipynb) for the **user** data stream.
+
+The transformations applied to these notbooks are similar to those performed in the [batch processing](#mwaa-orchestration) notebooks, ensuring consistency across our data processing approaches. After the data is transformed, it is stored in a **S3 storage** in **delta tables parquet** format, organized into respective sub-buckets for **geo**, **pin**, and **user** data. This storage format is optimized for easy retrieval, making the data readily available for querying and other downstream analytical tasks.
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
