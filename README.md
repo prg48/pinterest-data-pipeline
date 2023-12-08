@@ -149,7 +149,157 @@ In the final layer of our stream-processing data pipeline, the transformation of
 * [kinesis_pin_data_stream_processing.ipynb](/stream_processing/databricks_transformation_notebooks/kinesis_pin_data_stream_processing.ipynb) for the **pin** data stream,
 * [kinesis_user_data_stream_processing.ipynb](/stream_processing/databricks_transformation_notebooks/kinesis_user_data_stream_processing.ipynb) for the **user** data stream.
 
-The transformations applied to these notbooks are similar to those performed in the [batch processing](#mwaa-orchestration) notebooks, ensuring consistency across our data processing approaches. After the data is transformed, it is stored in a **S3 storage** in **delta tables parquet** format, organized into respective sub-buckets for **geo**, **pin**, and **user** data. This storage format is optimized for easy retrieval, making the data readily available for querying and other downstream analytical tasks.
+The transformations applied to these notebooks are similar to those performed in the [batch processing transformation](#mwaa-orchestration) notebooks, ensuring consistency across our data processing approaches. After the data is transformed, it is stored in a **S3 storage** in **delta tables parquet** format, organized into respective sub-buckets for **geo**, **pin**, and **user** data. This storage format is optimized for easy retrieval, making the data readily available for querying and other downstream analytical tasks.
+
+### Queries
+The majority of our data analysis focused on the **Transformed delta tables** bucket, which contains data processed through the [batch-processing data pipeline](#batch-processing). Detailed insights were derived by running a series of queries against this data, all of which are documented in the [queries.ipynb](/queries/queries.ipynb) notebook.
+
+These queries were executed within the Databricks environment, utilizing both **PySpark** and **Spark SQL** to inteact with and analyze the data. This approach allows us to leverage the powerful analytical abilities of Spark, enabling efficient processing and insightful results.
+
+Below are some examples of the queries that were performed, along with their respective results:
+
+#### Most popular category each year
+```python
+# create a window function partitioned by post_year and ordered by descending order
+window = Window.partitionBy("post_year").orderBy(F.desc("category_count"))
+
+# join df_pin and df_geo and find the most popular category each year
+popular_category_each_year = (
+    df_pin.join(df_geo, on=df_pin.ind == df_geo.ind, how="inner")
+    .withColumn("post_year", F.year(F.col("timestamp")))
+    .select(F.col("post_year"), F.col("category"))
+    .groupBy("post_year", "category").agg(F.count("*").alias("category_count"))
+    .withColumn("rank", F.rank().over(window))
+    .filter(F.col("rank") == 1)
+    .drop(F.col("rank"))
+)
+
+popular_category_each_year.show()
+```
+
+results:
+| post_year | category   | category_count |
+|-----------|------------|----------------|
+| 2017      | home-decor | 42             |
+| 2018      | christmas  | 210            |
+| 2019      | christmas  | 205            |
+| 2020      | christmas  | 191            |
+| 2021      | education  | 200            |
+| 2022      | christmas  | 171            |
+
+#### Most popular category for different age groups
+```sql
+%sql
+CREATE OR REPLACE TEMPORARY VIEW age_group_table AS
+SELECT ind, age, 
+        CASE
+          WHEN age BETWEEN 18 AND 24 THEN "18-24"
+          WHEN age BETWEEN 25 AND 35 THEN "25-35"
+          WHEN age BETWEEN 36 AND 50 THEN "36-50"
+          ELSE "+50"
+        END AS age_group
+ FROM view_user;
+
+CREATE OR REPLACE TEMPORARY VIEW age_group_count_table AS
+SELECT category, 
+        age_group, 
+        COUNT(*) AS category_count,
+        ROW_NUMBER() OVER (PARTITION BY age_group ORDER BY COUNT(*) DESC) as rank
+FROM view_pin
+INNER JOIN age_group_table ON view_pin.ind = age_group_table.ind
+GROUP BY age_group, category;
+
+SELECT age_group, category, category_count
+FROM age_group_count_table
+WHERE rank = 1;
+```
+
+results:
+| age_group | category  | category_count |
+|-----------|-----------|----------------|
+| +50       | vehicles  | 114            |
+| 18-24     | tattoos   | 615            |
+| 25-35     | christmas | 321            |
+| 36-50     | vehicles  | 215            |
+
+
+#### Median follower count of users based on their joining year
+```python
+median_follower_count_each_year = (
+    df_pin.join(df_user, "ind", "inner")
+    .withColumn("post_year", F.year(F.col("date_joined")))
+    .select("post_year", "follower_count")
+    .dropna("any")
+    .withColumn(
+        "rank",
+        F.row_number().over(Window.partitionBy("post_year").orderBy(F.asc("follower_count")))
+    )
+    .withColumn(
+        "total",
+        F.count("follower_count").over(Window.partitionBy("post_year"))
+    )
+    .filter(
+        (F.col("rank") == F.col("total")/2) | (F.col("rank") == (F.col("total")+1)/2)
+    )
+    .select("post_year", "follower_count")
+    .withColumnRenamed("follower_count", "median_follower_count")
+)
+
+median_follower_count_each_year.show()
+```
+
+results:
+| post_year | median_follower_count |
+|-----------|-----------------------|
+| 2015      | 160000                |
+| 2016      | 20000                 |
+| 2017      | 4000                  |
+
+#### Median follower count of users based on their joining year and age group
+```sql
+%sql
+WITH age_grouped AS (
+  SELECT *,
+        CASE 
+          WHEN age BETWEEN 18 AND 24 THEN '18-24'
+          WHEN age BETWEEN 25 AND 35 THEN '25-35'
+          WHEN age BETWEEN 36 AND 50 THEN '36-50'
+          ELSE '+50'
+        END AS age_group,
+        YEAR(date_joined) AS post_year
+  FROM view_user u
+  INNER JOIN view_pin p
+  ON u.ind = p.ind
+  WHERE follower_count IS NOT NULL
+),
+
+ranked_total_data AS (
+  SELECT *,
+        row_number() OVER (PARTITION BY post_year, age_group ORDER BY follower_count ASC) AS rank,
+        COUNT(follower_count) OVER (PARTITION BY post_year, age_group) AS total
+  FROM age_grouped
+)
+
+SELECT post_year, age_group, follower_count AS median_follower_count
+FROM ranked_total_data
+WHERE rank = total/2 OR rank = (total+1)/2
+```
+
+results:
+| post_year | age_group | median_follower_count |
+|-----------|-----------|-----------------------|
+| 2015      | +50       | 11000                 |
+| 2015      | 18-24     | 375000                |
+| 2015      | 25-35     | 37000                 |
+| 2015      | 36-50     | 22000                 |
+| 2016      | +50       | 3000                  |
+| 2016      | 18-24     | 46000                 |
+| 2016      | 25-35     | 24000                 |
+| 2016      | 36-50     | 9000                  |
+| 2017      | +50       | 3000                  |
+| 2017      | 18-24     | 7000                  |
+| 2017      | 25-35     | 4000                  |
+| 2017      | 36-50     | 3000                  |
 
 ## References
 * [Kafka REST proxy API documentation](https://docs.confluent.io/platform/current/kafka-rest/api.html)
@@ -163,3 +313,4 @@ The transformations applied to these notbooks are similar to those performed in 
 * [Benefits of storing data in delta table format](https://medium.com/datalex/5-reasons-to-use-delta-lake-format-on-databricks-d9e76cf3e77d)
 * [DatabricksSubmitRunOperator](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/operators/submit_run.html)
 * [Kinesis Data Streams API documentation](https://docs.aws.amazon.com/pdfs/kinesis/latest/APIReference/kinesis-api.pdf)
+* [Apache Spark's Structured Streaming with Amazon Kinesis on Databricks](https://www.databricks.com/blog/2017/08/09/apache-sparks-structured-streaming-with-amazon-kinesis-on-databricks.html)
