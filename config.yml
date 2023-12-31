@@ -1,0 +1,33 @@
+# variables related to AWS
+aws:
+  # AWS region
+  region: "eu-west-2"
+  # AWS access key for user
+  access_key: "AKIAXQX6E47J6DBA2MG2"
+  # AWS secret key for user
+  secret_key: "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"
+
+# variables related to databricks
+databricks:
+  # databricks account id
+  account_id: "e6423b9b-eac9-44d5-b352-a83a75907733"
+  # databricks server principle (for IAC API calls) client id
+  client_id: "ca706895-8dd1-4e70-8a04-e3078422f7f8"
+  # databricks server principle (for IAC API calls) client secret
+  client_secret: "dose4b0896745484a58b333de091dcb780db"
+  # name of the workspace to be provisioned in databricks
+  workspace_name: "pinterest-databricks-workspace"
+
+# S3 bucket names
+s3_storage:
+  # unique name for the main data processing storage bucket. For example "pintereset-batch-storage-processing-bucket"
+  main_processing_data_storage_name: "pinterest-batch-storage-processing-bucket"
+  # unique name for the storage for databricks workspace. For example "pinterest-databricks-root-bucket"
+  databricks_root_storage_name: "pinterest-databricks-root-bucket"
+  # unique name for the aiflow dag storage bucket. For example "pinterest-dag"
+  mwaa_dag_storage_name: "pinterest-dag"
+
+# mwaa environment
+mwaa:
+  # mwaa environment name. Make sure the words for the name is separated with '-'. For example "mwaa-env", not "mwaa_env"
+  mwaa_env_name: "mwaa-env"
