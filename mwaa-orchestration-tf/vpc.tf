@@ -1,38 +1,7 @@
-# module "vpc" {
-#   source = "cloudposse/vpc/aws"
-#   version = "2.1.0"
-
-#   ipv4_primary_cidr_block = "10.1.0.0/16"
-#   context = module.this.context
-# }
-
-# module "subnets" {
-#   source = "cloudposse/dynamic-subnets/aws"
-#   version = "2.4.1"
-
-#   availability_zones = data.aws_availability_zones.AZs.names
-#   vpc_id = module.vpc.vpc_id
-#   igw_id = [module.vpc.igw_id]
-#   ipv4_cidr_block = [module.vpc.vpc_cidr_block]
-#   nat_gateway_enabled = true
-#   nat_instance_enabled = false
-
-#   context = module.this.context
-# }
-
 # create a VPC for mwaa environment
 locals {
   cidr = "10.1.0.0/16"
 }
-
-# # vpc for mwaa
-# resource "aws_vpc" "vpc" {
-#   cidr_block = "10.1.0.0/16"
-
-#   tags = {
-#     Name = "mwaa-vpc"
-#   }
-# }
 
 module "vpc" {
   source = "terraform-aws-modules/vpc/aws"
@@ -88,60 +57,5 @@ module "vpc_endpoints" {
         Name = "mwaa-vpc-s3-endpoint"
       }
     }
-
-    # kms = {
-    #   service = "kms"
-    #   service_type = "Interface"
-    #   private_dns_enabled = true
-    #   subnet_ids = module.vpc.private_subnets
-    #   security_group_ids = [module.vpc.default_security_group_id]
-    #   tags = {
-    #     Name = "mwaa-vpc-kms-endpoint"
-    #   }
-    # }
-
-    # sqs = {
-    #   service = "sqs"
-    #   service_type = "Interface"
-    #   private_dns_enabled = true
-    #   subnet_ids = module.vpc.private_subnets
-    #   security_group_ids = [module.vpc.default_security_group_id]
-    #   tags = {
-    #     Name = "mwaa-cpv-sqs-endpoint"
-    #   }
-    # }
-
-    # logs = {
-    #   service = "logs"
-    #   service_type = "Interface"
-    #   private_dns_enabled = true
-    #   subnet_ids = module.vpc.private_subnets
-    #   security_group_ids = [module.vpc.default_security_group_id]
-    #   tags = {
-    #     Name = "mwaa-vpc-logs-endpoint"
-    #   }
-    # }
-
-    # ecr_api = {
-    #   service = "ecr.api"
-    #   service_type = "Interface"
-    #   private_dns_enabled = true
-    #   subnet_ids = module.vpc.private_subnets
-    #   security_group_ids = [module.vpc.default_security_group_id]
-    #   tags = {
-    #     Name = "mwaa-vpc-ecr-api-endpoint"
-    #   }
-    # }
-
-    # ecr_dkr = {
-    #   service = "ecr.dkr"
-    #   service_type = "Interface"
-    #   private_dns_enabled = true
-    #   subnet_ids = module.vpc.private_subnets
-    #   security_group_ids = [module.vpc.default_security_group_id]
-    #   tags = {
-    #     Name = "mwaa-vpc-ecr-dkr-endpoint"
-    #   }
-    # }
   }
 }

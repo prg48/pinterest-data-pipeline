@@ -14,7 +14,6 @@ module "mwaa" {
   webserver_access_mode = "PUBLIC_ONLY"
 
   airflow_configuration_options = {
-    # "core.load_default_connections" = "false"
     "core.load_examples" = "false"
     "webserver.dag_default_view" = "tree"
     "celery.pool" = "solo"
