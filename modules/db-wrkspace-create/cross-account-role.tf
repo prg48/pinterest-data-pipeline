@@ -23,7 +23,6 @@ resource "time_sleep" "wait_for_cross_account_role" {
 # create creadentials
 resource "databricks_mws_credentials" "this" {
   provider = databricks.mws
-  # account_id = var.databricks_account_id
   role_arn = aws_iam_role.cross_account_role.arn
   credentials_name = "databricks-credentials"
   depends_on = [ time_sleep.wait_for_cross_account_role ]
