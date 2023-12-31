@@ -4,6 +4,7 @@
 *.tfstate.backup
 *inventory
 *bootstrap-brokers
+*.terraform.lock.hcl
 
 ### Ansible ###
 *.retry
