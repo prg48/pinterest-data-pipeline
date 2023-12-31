@@ -1,0 +1,116 @@
+---
+- name: kafka REST proxy setup
+  hosts: all
+  become: yes
+  vars:
+    topic_name:
+      - "0e3bbd435bfb.geo"
+      - "0e3bbd435bfb.pin"
+      - "0e3bbd435bfb.user"
+
+  tasks:
+    - name: Install java
+      ansible.builtin.dnf:
+        name: java-1.8.0
+        state: present
+    
+    - name: Check if Kafka is already downloaded and unarchived
+      ansible.builtin.stat:
+        path: /home/ec2-user/kafka_2.12-2.8.1
+      register:
+        kafka_downloaded
+    
+    - name: Download Kafka
+      get_url:
+        url: https://archive.apache.org/dist/kafka/2.8.1/kafka_2.12-2.8.1.tgz
+        dest: /home/ec2-user/kafka_2.12-2.8.1.tgz
+        mode: '0644'
+      when: not kafka_downloaded.stat.exists
+
+    - name: Extract the downloaded Kafka tar file
+      ansible.builtin.unarchive:
+        src: /home/ec2-user/kafka_2.12-2.8.1.tgz
+        dest: /home/ec2-user/
+        remote_src: yes
+      when: not kafka_downloaded.stat.exists
+    
+    - name: Delete the downloaded Kafka tar file
+      ansible.builtin.file:
+        path: /home/ec2-user/kafka_2.12-2.8.1.tgz
+        state: absent
+      when: not kafka_downloaded.stat.exists
+
+    - name: Add Kafka bin to PATH
+      copy:
+        dest: /etc/profile.d/kafka.sh
+        content: |
+          #!/bin/sh
+          export PATH=$PATH:/home/ec2-user/kafka_2.12-2.8.1/bin
+        mode: 0755
+
+    - name: Read bootstrap brokers from file
+      set_fact:
+        bootstrap_servers: "{{ lookup('file', 'bootstrap-brokers') }}"
+
+    - name: Check existing Kafka topics
+      command: "/home/ec2-user/kafka_2.12-2.8.1/bin/kafka-topics.sh --list --bootstrap-server {{ bootstrap_servers }}"
+      register: existing_topics
+      changed_when: false
+    
+    - name: Create Kafka topics if it does not exist
+      command: "/home/ec2-user/kafka_2.12-2.8.1/bin/kafka-topics.sh --create --topic {{ item }} --bootstrap-server {{ bootstrap_servers }} --partitions 1 --replication-factor 1"
+      loop: "{{ topic_name }}"
+      when: "'{{ item }}' not in existing_topics.stdout"
+
+    - name: Check if confluent package is already downloaded and unarchived
+      ansible.builtin.stat:
+        path: /home/ec2-user/confluent-7.2.0
+      register:
+        confluent_downloaded
+
+    - name: Download confluent package that contains Kafka REST proxy
+      get_url:
+        url: https://packages.confluent.io/archive/7.2/confluent-7.2.0.tar.gz
+        dest: /home/ec2-user/confluent-7.2.0.tar.gz
+        mode: '0644'
+      when: not confluent_downloaded.stat.exists
+
+    - name: unarchive the confluent package that contains Kafka REST proxy
+      ansible.builtin.unarchive:
+        src: /home/ec2-user/confluent-7.2.0.tar.gz
+        dest: /home/ec2-user/
+        remote_src: yes
+      when: not confluent_downloaded.stat.exists
+
+    - name: Delete the downloaded confluent tar file
+      ansible.builtin.file:
+        path: /home/ec2-user/confluent-7.2.0.tar.gz
+        state: absent
+      when: not confluent_downloaded.stat.exists
+
+    - name: Update kafka-rest.properties with bootstrap servers string
+      ansible.builtin.lineinfile:
+        path: /home/ec2-user/confluent-7.2.0/etc/kafka-rest/kafka-rest.properties
+        regexp: '^bootstrap.servers='
+        line: "bootstrap.servers=PLAINTEXT://{{ bootstrap_servers }}"
+        create: no
+        state: present
+
+    - name: Copy Kafka REST proxy systemd service file to ec2
+      ansible.builtin.copy:
+        src: kafka-rest.service
+        dest: /etc/systemd/system/kafka-rest.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Reload systemd to recognize Kafka REST Proxy service
+      ansible.builtin.systemd:
+        daemon_reload: yes
+
+    - name: Ensure Kafka REST Proxy service is up and running
+      ansible.builtin.service:
+        name: kafka-rest
+        state: started
+        enabled: yes
+    
