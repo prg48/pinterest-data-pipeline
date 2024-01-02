@@ -6,16 +6,13 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 
 ## Project Architecture
 
-| ![pinterest architecture](/images/pinterest_architecture.png) |
+| ![pinterest architecture](/images/pinterest_architecture.jpeg) |
 | :------------------------------------------------: |
 | pinterest architecture                              |
 
 ## Table of Contents
 
-
-### Getting Started
-
-#### Requirements
+### Requirements
 |**Name** |**Version** |
 |---------|------------|
 |[python](https://www.python.org/downloads/)   |3.x         |
@@ -26,20 +23,20 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 |[aws account](https://aws.amazon.com/resources/create-account/) | -       |
 |[databricks account (not community edition)](https://docs.databricks.com/en/getting-started/index.html) | - |
 
-#### Terraform providers
+### Terraform providers
 |**Name** | **Version** |
 |---------|-------------|
 |[aws](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)      | >=4.63.0    |
 |[databricks](https://registry.terraform.io/providers/databricks/databricks/latest/docs) | -         |
 
-#### Cloning the project
+### Cloning the project
 To clone the project, ensure you have Git installed on your system. You can download Git from the [official Git page](https://git-scm.com/downloads). Use the following command to clone the project:
 
 ```bash
 git clone https://github.com/prg48/pinterest-data-pipeline.git
 ```
 
-#### Project Structure
+### Project Structure
 The project is organized into several Terraform directories, each responsible for managing its own state and variables. This modular approach ensures that each component is isolated, manageable, and scalable. Below is an overview of the project structure:
 
 * [batch-ingestion-tf](/batch-ingestion-tf/): This directory is dedicated to setting up the infrastructure required for batch data ingestion. It includes the provisioning of resources such as the **API Gateway**, **Managed Services for Kafka (MSK) cluster**, **Kafka client**, and other associated services. Additionally, it manages the configuration of the Kafka client through Ansible.
@@ -56,9 +53,10 @@ The project is organized into several Terraform directories, each responsible fo
 * [requirements.txt](/requirements.txt): Contains python requirements to run [emulation-scripts](/emulation-scripts/), [prepare-tfvars.py](/prepare-tfvars.py) etc.
 * [README.md](/README.md): Documentation for the project.
 
-#### Setup
+### Preparing Terraform Variables (tfvars)
+Each Terraform directory in this project requires specific variables to provision the related infrastructure. These variables are typically passed with a **terraform.tfvars** file in the respective directories, eliminating the need to manually enter each variable at Terraform runtime. The script [prepare-tfvars.py](/prepare-tfvars.py) is designed to automate this process by reading the values from [config.yml](/config.yml) and preparing **terraform.tfvars** for each Terraform directory. To facilitate this automation, AWS and Databricks credentials must be supplied to [config.yml] file. The credentials can be acquired as follows:
 
-##### Getting AWS Access Keys and Configuring AWS CLI
+#### Getting AWS Access Keys and Configuring AWS CLI
 
 To interact with AWS services, you'll need to [set up access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c) and [configure the AWS CLI](https://cloudacademy.com/blog/how-to-use-aws-cli/) with your credentials.
 
@@ -70,9 +68,9 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 
 4. **Configure AWS CLI**: [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if you haven't already and [configure it](https://cloudacademy.com/blog/how-to-use-aws-cli/) using the **aws configure** command. Input your access key ID, secret access key, and default region when prompted. Ensure that the region matches the one specified in your [config.yml](/config.yml) file.
 
-##### Getting Databricks Account Id and Service principal token
+#### Getting Databricks Account Id and Service principal token
 
-To automate interactions with Databricks for provisioning workspaces and clusters via Terraform, you'll need a[service principal](https://docs.databricks.com/en/dev-tools/service-principals.html) and your [databricks account ID](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id).
+To automate interactions with Databricks for provisioning workspaces and clusters via Terraform, you'll need a [service principal](https://docs.databricks.com/en/dev-tools/service-principals.html) and your [databricks account ID](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id).
 
 1. **Creating a Service Principal**: A service principal allows you to automate Databricks API interactions through IaC tools like Terraform. To create one:
     * Navigate to the **User management** tab in your Databricks account.
@@ -84,6 +82,32 @@ To automate interactions with Databricks for provisioning workspaces and cluster
 2. **Locating the account ID**: Your Databricks account ID is located at the top right corner of the Databricks console, accessible by clicking on your account email.
 
 3. **Update config.yml**: Input the generated OAuth secret into the **client_secret** field, the OAuth client ID into the **client_id** field, and the account ID into the **account_id** field in your [config.yml](/config.yml) file. 
+
+#### Finalizing Configuration and Preparing tfvars
+
+To ensure smooth setup and execution of the Terraform scripts, follow these final steps to complete the configuration and prepare the **terraform.tfvars** files:
+
+1. **Complete config.yml**: Complete the [config.yml](/config.yml) file with preferred S3 bucket names, databricks workspace name and mwaa environment name on addition to the **AWS** and **Databricks** credentials above. 
+
+2. **Activate Virtual Environment**: [Set up  and activate virtual environment](https://lynn-kwong.medium.com/how-to-create-virtual-environments-with-venv-and-conda-in-python-31814c0a8ec2) using conda or virtualenv.
+
+3. **Install Requirements**: With the virtual environment activated, install the necessary Python packages with:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. **Run prepare-tfvars.py**: Execute the [prepare-tfvars.py](/prepare-tfvars.py) script to automatically generate a **terraform.tfvars** file for each Terraform directory.
+    ```bash
+    python prepare-tfvars.py
+    ```
+
+5. **Verify tfvars Creation**: After running the script, verify that a **terraform.tfvars** file has been created in each of the Terraform directories.
+
+### Setting up the infrastructure
+
+
+
+#### 
 
 #### References
 * [Download python](https://www.python.org/downloads/)
