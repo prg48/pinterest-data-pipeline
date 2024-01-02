@@ -192,12 +192,12 @@ To execute the stream processing pipeline, you'll need to manually initiate the 
 1. **Initiate Stream Processing Notebooks in Databricks**: Unlike batch processing, stream processing isn't orchestrated with Airflow and needs to be manually triggered in the Databricks console.
     * Navigate to your **Databricks Console > Workspaces**.
     * Locate and access the workspace created by [databricks-tf](/databricks-tf/). Add your main user to this workspace and assign admin privileges. This is necessary as the workspace is initially owned by the service principal.
-    * Go to **Users** and find the service principal. You'll find the notebooks uploaded by [databricks-tf](/databricks-tf/) in the service principal's user space.
+    * Log in to the workspace, go to **Users** and find the service principal. You'll find the notebooks uploaded by [databricks-tf](/databricks-tf/) in the service principal's user space.
     * Open the **kinesis_geo_data_stream_processing.ipynb**, **kinesis_pin_data_stream_processing.ipynb** and **kinesis_user_data_stream_processing.ipynb** notebooks. Run each notebook to start the stream processing.
 
 > **Note**: The streaming notebooks are configured to listen to the Kinesis data streams set up by [stream-ingestion-tf](/stream-ingestion-tf/) on the pre-configured shards.
 
-2. **Initiate Emulation Script**: Simulate data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation_streaming.py] emulation script for streaming.
+2. **Initiate Emulation Script**: Simulate data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation_streaming.py](/emulation-scripts/user_posting_emulation_streaming.py) emulation script for streaming.
 
 ```bash
 cd ../emulation-scripts
