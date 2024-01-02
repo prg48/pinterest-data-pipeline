@@ -6,7 +6,7 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 
 ## Project Architecture
 
-| ![pinterest architecture](/images/pinterest_architecture.jpg) |
+| ![pinterest architecture](/images/pinterest_architecture.png) |
 | :------------------------------------------------: |
 | batch-processing data pipeline architecture                              |
 
