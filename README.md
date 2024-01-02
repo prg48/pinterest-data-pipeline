@@ -12,8 +12,6 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 
 ## Table of Contents
 
-## Table of Contents
-
 - [Requirements](#requirements)
 - [Terraform providers](#terraform-providers)
 - [Cloning the project](#cloning-the-project)
