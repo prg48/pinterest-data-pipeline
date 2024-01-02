@@ -43,11 +43,11 @@ git clone https://github.com/prg48/pinterest-data-pipeline.git
 The project is organized into several Terraform directories, each responsible for managing its own state and variables. This modular approach ensures that each component is isolated, manageable, and scalable. Below is an overview of the project structure:
 
 * [batch-ingestion-tf](/batch-ingestion-tf/): This directory is dedicated to setting up the infrastructure required for batch data ingestion. It includes the provisioning of resources such as the **API Gateway**, **Managed Services for Kafka (MSK) cluster**, **Kafka client**, and other associated services. Additionally, it manages the configuration of the Kafka client through Ansible.
-* [main-storage-s3-tf](/main-storage-s3-tf/): Contains the Terraform scripts for the main S3 bucket, which is used for storing processing data and other associated files. This bucket acts as the central repository for all data handled by the pipeline.
+* [main-storage-s3-tf](/main-storage-s3-tf/): Contains the Terraform scripts for the main S3 bucket, which is used for storing processing data and other associated files. This bucket acts as the central repository for all data handled by the pipelines.
 * [stream-ingestion-tf](/stream-ingestion-tf/): Focuses on the infrastructure required for **stream data ingestion**. It provisions resources such as the **API Gateway** and **Kinesis Data Streams**, along with other necessary services to handle real-time data flow.
 * [databricks-tf](/databricks-tf/): Handles the creation and configuration of the **Databricks workspace** and **cluster**. It also manages the transfer of notebooks from the local repository to the Databricks workspace.
 * [mwaa-orchestration-tf](/mwaa-orchestration-tf/): Responsible for provisioning the **Managed Workflows for Apache Airflow (MWAA)** environment and its associated services. It includes script to dynamically prepare DAG according to the notebook paths in the Databricks workspace created by the [databricks-tf](/databricks-tf/) directory.
-* [databricks-notebooks](/databricks-notebooks/): This directory contains the Databricks notebooks that will be uploaded to the Databricks workspace bt the [databricks-tf](/databricks-tf/) directory.
+* [databricks-notebooks](/databricks-notebooks/): This directory contains the Databricks notebooks that will be uploaded to the Databricks workspace by the [databricks-tf](/databricks-tf/) directory.
 * [emulation-scripts](/emulation-scripts/): Includes scripts to emulate producers for **Kafka** and **Kinesis Datastreams**.
 * [modules](/modules/): Contains reusable Terraform modules for various components like **Databricks workspace provisioning**, **S3**, and **Kinesis Data Streams**.
 * [images](/images/): Hosts images used in the [README.md](/README.md) documentation.
@@ -58,19 +58,7 @@ The project is organized into several Terraform directories, each responsible fo
 
 #### Setup
 
-To initialize the project, you'll need to configure several variables within the [config.yml](/config.yml) file located at the root of the project. This file contains essential parameters for AWS, Databricks, S3 bucket names, and MWAA environment settings. Here's a brief overview of what you need to do: 
-
-1. **AWS Configuration**: Input your AWS region, access key, and secret key. These credentials will facilitate the interaction between the Terraform scripts and your AWS account to provision necessary resources.
-
-2. **Databricks Configuration**: Provide details such as your Databricks account ID, client ID, and client secret. These are crucial for setting up and managing your Databricks workspace through the project.
-
-3. **S3 Bucket Names**: Assign unique names for various S3 buckets that will be used for data storage, Databricks workspace, and Airflow DAGs.
-
-4. **MWAA Environment**: Define the name for your Managed Workflows for Apache Airflow (MWAA) environment. Ensure the naming convention follows the guidelines (e.g., using hyphens instead of underscores).
-
-After configuring these variables, you're ready to proceed with the project setup. Ensure all the prerequisites are installed and properly configured before moving forward.
-
-#### Getting AWS Access Keys and Configuring AWS CLI
+##### Getting AWS Access Keys and Configuring AWS CLI
 
 To interact with AWS services, you'll need to [set up access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c) and [configure the AWS CLI](https://cloudacademy.com/blog/how-to-use-aws-cli/) with your credentials.
 
@@ -78,9 +66,24 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 
 2. **Generate Access Keys**: Once you have a user, [generate a new set of access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c) (access key ID and secret access key). These keys will be used to authenticate your requests to AWS.
 
-3. **Update config.yml**: Enter the generated access key ID and secret access key in the respective fields (access_key and secret_key) in the [config.yml](/config.yml) file. This step is crucial as it allows Terraform and Databricks to interact with AWS services under your account.
+3. **Update config.yml**: Enter the generated access key ID and secret access key in the respective fields (access_key and secret_key) in the [config.yml](/config.yml) file. This step is crucial as it allows Terraform to interact with AWS services under your account.
 
 4. **Configure AWS CLI**: [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if you haven't already and [configure it](https://cloudacademy.com/blog/how-to-use-aws-cli/) using the **aws configure** command. Input your access key ID, secret access key, and default region when prompted. Ensure that the region matches the one specified in your [config.yml](/config.yml) file.
+
+##### Getting Databricks Account Id and Service principal token
+
+To automate interactions with Databricks for provisioning workspaces and clusters via Terraform, you'll need a[service principal](https://docs.databricks.com/en/dev-tools/service-principals.html) and your [databricks account ID](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id).
+
+1. **Creating a Service Principal**: A service principal allows you to automate Databricks API interactions through IaC tools like Terraform. To create one:
+    * Navigate to the **User management** tab in your Databricks account.
+    * Select the **Service principals** tab, then click the **Add service principal** button and provide a name for it.
+    * After creation, click on the service principal's name. Under the **Roles** tab, assign the **Account admin** role.
+    * Go to the **Permissions** tab, click **Grant access**, and enter the service principal's name in the **User, Group or Service Principal** section. Assign the **Service Principal: User** role and save your changes.
+    * Lastly, under the **Principal information** tab, click **Generate secret** to create an OAuth secret and Client ID. These credentials are used for authenticating the service principal. 
+
+2. **Locating the account ID**: Your Databricks account ID is located at the top right corner of the Databricks console, accessible by clicking on your account email.
+
+3. **Update config.yml**: Input the generated OAuth secret into the **client_secret** field, the OAuth client ID into the **client_id** field, and the account ID into the **account_id** field in your [config.yml](/config.yml) file. 
 
 #### References
 * [Download python](https://www.python.org/downloads/)
@@ -93,3 +96,5 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 * [Create a new user in AWs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
 * [Generating AWS access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c)
 * [configure aws cli](https://cloudacademy.com/blog/how-to-use-aws-cli/)
+* [Service principal for Databricks automation](https://docs.databricks.com/en/dev-tools/service-principals.html)
+* [Manage your Databricks account](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id)
