@@ -54,7 +54,7 @@ The project is organized into several Terraform directories, each responsible fo
 * [README.md](/README.md): Documentation for the project.
 
 ### Preparing Terraform Variables (tfvars)
-Each Terraform directory in this project requires specific variables to provision the related infrastructure. These variables are typically passed with a **terraform.tfvars** file in the respective directories, eliminating the need to manually enter each variable at Terraform runtime. The script [prepare-tfvars.py](/prepare-tfvars.py) is designed to automate this process by reading the values from [config.yml](/config.yml) and preparing **terraform.tfvars** for each Terraform directory. To facilitate this automation, AWS and Databricks credentials must be supplied to [config.yml] file. The credentials can be acquired as follows:
+Each Terraform directory in this project requires specific variables to provision the related infrastructure. These variables are typically passed with a **terraform.tfvars** file in the respective directories, eliminating the need to manually enter each variable at Terraform runtime. The script [prepare-tfvars.py](/prepare-tfvars.py) is designed to automate this process by reading the values from [config.yml](/config.yml) and preparing **terraform.tfvars** for each Terraform directory. To facilitate this automation, AWS and Databricks credentials must be supplied to [config.yml](/config.yml) file. The credentials can be acquired as follows:
 
 #### Getting AWS Access Keys and Configuring AWS CLI
 
@@ -66,7 +66,7 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 
 3. **Update config.yml**: Enter the generated access key ID and secret access key in the respective fields (access_key and secret_key) in the [config.yml](/config.yml) file. This step is crucial as it allows Terraform to interact with AWS services under your account.
 
-4. **Configure AWS CLI**: [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if you haven't already and [configure it](https://cloudacademy.com/blog/how-to-use-aws-cli/) using the **aws configure** command. Input your access key ID, secret access key, and default region when prompted. Ensure that the region matches the one specified in your [config.yml](/config.yml) file.
+4. **Configure AWS CLI**: [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) and [configure it](https://cloudacademy.com/blog/how-to-use-aws-cli/) if you haven't already using the **aws configure** command. Input your access key ID, secret access key, and default region when prompted. Ensure that the region matches the one specified in your [config.yml](/config.yml) file.
 
 #### Getting Databricks Account Id and Service principal token
 
@@ -107,7 +107,7 @@ To ensure smooth setup and execution of the Terraform scripts, follow these fina
 
 To establish the infrastructure for this project, you'll need to navigate through various Terraform directories and execute Terraform commands. It's crucial to follow a specific order when setting up the infrastructure components due to some of their interdependencies:
 
-1. **S3 Main Storage Setup**: Begin with the [main-storage-s3-tf] directory.
+1. **S3 Main Storage Setup**: Begin with the [main-storage-s3-tf](/main-storage-s3-tf/) directory.
     ```bash
     cd main-storage-s3-tf
     terraform init
@@ -166,6 +166,27 @@ To establish the infrastructure for this project, you'll need to navigate throug
         "service_principal_oauth": true
     }
     ```
+
+### Running Batch Processing Pipeline
+To run the batch processing pipeline, follow these steps:
+
+1. Initiate Emulation Script: Start by emulating data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation.py](/emulation-scripts/user_posting_emulation.py) script.
+```bash
+cd ../emulation-scripts
+python user_posting_emulation.py
+```
+
+> **Note**: Allow the script to fully complete its execution. Once finished, it should have produced and sent all the records to the API Gateway, through kafka-client, MSK and MSK connect and sank the records to the S3 bucket configured in [main-storage-s3-tf](/main-storage-s3-tf/) under the 'topics' directory.
+
+2. Orchestrate Processing with Airflow: Once the data is produced and stored in S3, the next step is to process it using Airflow.
+    * Navigate to **AWS Console > MWAA** and open **Airflow UI**.
+    * Go to the **DAGs** tab, and locate **batch_processing_dag**.
+    * Trigger the DAG manually by clicking on the **play** button on the right side of the Airflow UI.
+
+> **Note**: After the DAG completes its run, the processed data will be available in the S3 bucket set up by [main-storage-s3-tf](/main-storage-s3-tf/) under the '/delta_tables/transformed' directory. This data represents the transformed and processed output of the batch processing pipeline.
+
+### Running Stream Processing Pipeline
+
 
 #### References
 * [Download python](https://www.python.org/downloads/)
