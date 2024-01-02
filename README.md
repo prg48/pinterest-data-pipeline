@@ -39,6 +39,23 @@ To clone the project, ensure you have Git installed on your system. You can down
 git clone https://github.com/prg48/pinterest-data-pipeline.git
 ```
 
+#### Project Structure
+The project is organized into several Terraform directories, each responsible for managing its own state and variables. This modular approach ensures that each component is isolated, manageable, and scalable. Below is an overview of the project structure:
+
+* [batch-ingestion-tf](/batch-ingestion-tf/): This directory is dedicated to setting up the infrastructure required for batch data ingestion. It includes the provisioning of resources such as the **API Gateway**, **Managed Services for Kafka (MSK) cluster**, **Kafka client**, and other associated services. Additionally, it manages the configuration of the Kafka client through Ansible.
+* [main-storage-s3-tf](/main-storage-s3-tf/): Contains the Terraform scripts for the main S3 bucket, which is used for storing processing data and other associated files. This bucket acts as the central repository for all data handled by the pipeline.
+* [stream-ingestion-tf](/stream-ingestion-tf/): Focuses on the infrastructure required for **stream data ingestion**. It provisions resources such as the **API Gateway** and **Kinesis Data Streams**, along with other necessary services to handle real-time data flow.
+* [databricks-tf](/databricks-tf/): Handles the creation and configuration of the **Databricks workspace** and **cluster**. It also manages the transfer of notebooks from the local repository to the Databricks workspace.
+* [mwaa-orchestration-tf](/mwaa-orchestration-tf/): Responsible for provisioning the **Managed Workflows for Apache Airflow (MWAA)** environment and its associated services. It includes script to dynamically prepare DAG according to the notebook paths in the Databricks workspace created by the [databricks-tf](/databricks-tf/) directory.
+* [databricks-notebooks](/databricks-notebooks/): This directory contains the Databricks notebooks that will be uploaded to the Databricks workspace bt the [databricks-tf](/databricks-tf/) directory.
+* [emulation-scripts](/emulation-scripts/): Includes scripts to emulate producers for **Kafka** and **Kinesis Datastreams**.
+* [modules](/modules/): Contains reusable Terraform modules for various components like **Databricks workspace provisioning**, **S3**, and **Kinesis Data Streams**.
+* [images](/images/): Hosts images used in the [README.md](/README.md) documentation.
+* [config.yml](/config.yml): The main configuration file for the project. It includes necessary parameters for **AWS**, **Databricks**, **S3 bucket** names, and **MWAA** environment settings.
+* [prepare-tfvars.py](/prepare-tfvars.py): Script designed to prepare **terraform.tfvars** for each terraform directory based on the values supplied in [config.yml](/config.yml).
+* [requirements.txt](/requirements.txt): Contains python requirements to run [emulation-scripts](/emulation-scripts/), [prepare-tfvars.py](/prepare-tfvars.py) etc.
+* [README.md](/README.md): Documentation for the project.
+
 #### Setup
 
 To initialize the project, you'll need to configure several variables within the [config.yml](/config.yml) file located at the root of the project. This file contains essential parameters for AWS, Databricks, S3 bucket names, and MWAA environment settings. Here's a brief overview of what you need to do: 
@@ -66,13 +83,13 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 4. **Configure AWS CLI**: [Install the AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) if you haven't already and [configure it](https://cloudacademy.com/blog/how-to-use-aws-cli/) using the **aws configure** command. Input your access key ID, secret access key, and default region when prompted. Ensure that the region matches the one specified in your [config.yml](/config.yml) file.
 
 #### References
-[Download python](https://www.python.org/downloads/)
-[Install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
-[Creating a virtual environment in conda/venv](https://lynn-kwong.medium.com/how-to-create-virtual-environments-with-venv-and-conda-in-python-31814c0a8ec2)
-[Installing terraform](https://developer.hashicorp.com/terraform/install)
-[Installing/Updating aws cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
-[Create a AWS account](https://aws.amazon.com/resources/create-account/)
-[Create a databricks account](https://docs.databricks.com/en/getting-started/index.html)
-[Create a new user in AWs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
-[Generating AWS access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c)
-[configure aws cli](https://cloudacademy.com/blog/how-to-use-aws-cli/)
+* [Download python](https://www.python.org/downloads/)
+* [Install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+* [Creating a virtual environment in conda/venv](https://lynn-kwong.medium.com/how-to-create-virtual-environments-with-venv-and-conda-in-python-31814c0a8ec2)
+* [Installing terraform](https://developer.hashicorp.com/terraform/install)
+* [Installing/Updating aws cli](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html)
+* [Create a AWS account](https://aws.amazon.com/resources/create-account/)
+* [Create a databricks account](https://docs.databricks.com/en/getting-started/index.html)
+* [Create a new user in AWs](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html)
+* [Generating AWS access keys](https://www.youtube.com/watch?v=HuE-QhrmE1c)
+* [configure aws cli](https://cloudacademy.com/blog/how-to-use-aws-cli/)
