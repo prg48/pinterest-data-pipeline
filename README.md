@@ -105,9 +105,67 @@ To ensure smooth setup and execution of the Terraform scripts, follow these fina
 
 ### Setting up the infrastructure
 
+To establish the infrastructure for this project, you'll need to navigate through various Terraform directories and execute Terraform commands. It's crucial to follow a specific order when setting up the infrastructure components due to some of their interdependencies:
 
+1. **S3 Main Storage Setup**: Begin with the [main-storage-s3-tf] directory.
+    ```bash
+    cd main-storage-s3-tf
+    terraform init
+    terraform apply # Confirm with 'yes' when prompted
+    ```
 
-#### 
+2. **Batch Ingestion Setup**: 
+    ```bash
+    cd ../batch-ingestion-tf
+    terraform init
+    terraform apply # Confirm with 'yes' when prompted
+    ```
+
+     > **Note**: MSK might take upto 30 minutes to provision. Ensure its fully set up before proceeding.
+
+    ```bash
+    cd ansible
+    ansible-playbook kafka-client-setup.yml
+    ```
+
+3. **Stream Ingestion Setup**: 
+    ```bash
+    cd ../stream-ingestion-tf
+    terraform init
+    terraform apply # Confirm with 'yes' when prompted
+    ```
+
+4. **Databricks Setup**:
+    ```bash
+    cd ../databricks-tf
+    terraform init
+    terraform apply # Confirm with 'yes' when prompted
+    ```
+
+    > **Note**: Note the 'databricks_host' output from the console for later use.
+
+5. **MWAA Setup**:
+    ```bash
+    cd ../mwaa-orchestration-tf
+    python prepare-dag.py
+    terraform init
+    terraform apply # Confirm with 'yes' when prompted
+    ```
+
+    > **Note**: MWAA might take upto 30 minutes to provision. Ensure its fully set up before proceeding.
+
+6. **MWAA Databricks Connection Setup**: After MWAA is up and running, configure the Databricks connection in Airflow:
+
+    * Navigate to **AWS Console > MWAA** and open **Airflow UI**.
+    * In **Admin > Connections**, locate and edit the **databricks_default** connection.
+    * Set **Host** to the 'databricks_host' URL noted earlier.
+    * Set **Login** to the 'client_id' and **Password** to the 'client_secret' from your [config.yml](/config.yml).
+    * In **Extra**, enter the following JSON and save the connection:
+    ```json
+    {
+        "service_principal_oauth": true
+    }
+    ```
 
 #### References
 * [Download python](https://www.python.org/downloads/)
@@ -122,3 +180,4 @@ To ensure smooth setup and execution of the Terraform scripts, follow these fina
 * [configure aws cli](https://cloudacademy.com/blog/how-to-use-aws-cli/)
 * [Service principal for Databricks automation](https://docs.databricks.com/en/dev-tools/service-principals.html)
 * [Manage your Databricks account](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id)
+* [Addig Databricks connection to Airflow](https://airflow.apache.org/docs/apache-airflow-providers-databricks/stable/connections/databricks.html)
