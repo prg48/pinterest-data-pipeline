@@ -206,6 +206,19 @@ python user_posting_emulation_streaming.py
 
 > **Note**: Allow the emulation script to fully complete its execution. Once finished, manually stop the streaming notebooks in Databricks. The notebooks will have processed and stored the streaming data in near-real time in the S3 bucket configured by [main-storage-s3-tf](/main-storage-s3-tf/) under the '/test_streaming_delta_tables' directory.
 
+#### Running Queries on Processed Data
+After successfully completing the [batch processing pipeline](#running-batch-processing-pipeline), you can run queries on the processed data to extract insights or validate the transformations. Similar to the [stream processing pipeline](#running-stream-processing-pipeline), these queries are executed manually in the Databricks workspace. Follow these steps:
+
+1. **Access the Databricks Workspace**: Log in to your Databricks workspace that you set up earlier.
+
+2. **Locate the Notebook**: Navigate to the service principal's user space where you'll find the **queries.ipynb notebook**. This notebook contains predefined queries tailored to the processed data.
+
+3. **Run the Notebook**:  Open the **queries.ipynb** notebook and execute the cells. As the queries run, they will fetch and display data from the processed datasets.
+
+> **Note**: The results from these queries are displayed directly in the notebook and are not stored elsewhere.
+
+
+
 #### References
 * [Download python](https://www.python.org/downloads/)
 * [Install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
