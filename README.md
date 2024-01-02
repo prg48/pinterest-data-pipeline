@@ -6,7 +6,7 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 
 ## Project Architecture
 
-| ![pinterest architecture](/images/pinterest_architecture.png) |
+| ![pinterest architecture](/images/pinterest_architecture.jpeg) |
 | :------------------------------------------------: |
 | pinterest architecture                              |
 
@@ -96,12 +96,18 @@ To ensure smooth setup and execution of the Terraform scripts, follow these fina
     pip install -r requirements.txt
     ```
 
-4. **Run prepare-tfvars.py**: Execute the [prepare-tfvars.py] script to automatically generate a **terraform.tfvars** file for each Terraform directory.
+4. **Run prepare-tfvars.py**: Execute the [prepare-tfvars.py](/prepare-tfvars.py) script to automatically generate a **terraform.tfvars** file for each Terraform directory.
     ```bash
     python prepare-tfvars.py
     ```
 
 5. **Verify tfvars Creation**: After running the script, verify that a **terraform.tfvars** file has been created in each of the Terraform directories.
+
+### Setting up the infrastructure
+
+
+
+#### 
 
 #### References
 * [Download python](https://www.python.org/downloads/)
