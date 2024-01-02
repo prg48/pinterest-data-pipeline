@@ -12,6 +12,23 @@ This project, developed as part of the **AI Core Data Engineering Bootcamp**, sh
 
 ## Table of Contents
 
+## Table of Contents
+
+- [Requirements](#requirements)
+- [Terraform providers](#terraform-providers)
+- [Cloning the project](#cloning-the-project)
+- [Project Structure](#project-structure)
+- [Preparing Terraform Variables (tfvars)](#preparing-terraform-variables-tfvars)
+  - [Getting AWS Access Keys and Configuring AWS CLI](#getting-aws-access-keys-and-configuring-aws-cli)
+  - [Getting Databricks Account Id and Service principal token](#getting-databricks-account-id-and-service-principal-token)
+  - [Finalizing Configuration and Preparing tfvars](#finalizing-configuration-and-preparing-tfvars)
+- [Setting up the infrastructure](#setting-up-the-infrastructure)
+- [Running Batch Processing Pipeline](#running-batch-processing-pipeline)
+- [Running Stream Processing Pipeline](#running-stream-processing-pipeline)
+- [Running Queries on Processed Data](#running-queries-on-processed-data)
+- [Architecture Tear Down](#architecture-tear-down)
+- [References](#references)
+
 ### Requirements
 |**Name** |**Version** |
 |---------|------------|
@@ -206,7 +223,7 @@ python user_posting_emulation_streaming.py
 
 > **Note**: Allow the emulation script to fully complete its execution. Once finished, manually stop the streaming notebooks in Databricks. The notebooks will have processed and stored the streaming data in near-real time in the S3 bucket configured by [main-storage-s3-tf](/main-storage-s3-tf/) under the '/test_streaming_delta_tables' directory.
 
-#### Running Queries on Processed Data
+### Running Queries on Processed Data
 After successfully completing the [batch processing pipeline](#running-batch-processing-pipeline), you can run queries on the processed data to extract insights or validate the transformations. Similar to the [stream processing pipeline](#running-stream-processing-pipeline), these queries are executed manually in the Databricks workspace. Follow these steps:
 
 1. **Access the Databricks Workspace**: Log in to your Databricks workspace that you set up earlier.
@@ -226,7 +243,7 @@ terraform destroy # Confirm with 'yes' when prompted
 
 > **Note**: Cloudwatch logs for MWAA must be deleted manually by navigating to AWS console and the KMS key used by MSK has deletion window of 7 days. Therefore, it will take 7 days before permanent deletetion.
 
-#### References
+### References
 * [Download python](https://www.python.org/downloads/)
 * [Install ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 * [Creating a virtual environment in conda/venv](https://lynn-kwong.medium.com/how-to-create-virtual-environments-with-venv-and-conda-in-python-31814c0a8ec2)
