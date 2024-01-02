@@ -217,7 +217,14 @@ After successfully completing the [batch processing pipeline](#running-batch-pro
 
 > **Note**: The results from these queries are displayed directly in the notebook and are not stored elsewhere.
 
+### Architecture Tear Down
+When you no longer need the infrastructure set up for this project, you can decommission it to avoid incurring unnecessary costs. To tear down the architecture, navigate to each of the terraform directories apply the following command:
 
+```bash
+terraform destroy # Confirm with 'yes' when prompted
+```
+
+> **Note**: Cloudwatch logs for MWAA must be deleted manually by navigating to AWS console and the KMS key used by MSK has deletion window of 7 days. Therefore, it will take 7 days before permanent deletetion.
 
 #### References
 * [Download python](https://www.python.org/downloads/)
