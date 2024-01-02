@@ -170,7 +170,8 @@ To establish the infrastructure for this project, you'll need to navigate throug
 ### Running Batch Processing Pipeline
 To run the batch processing pipeline, follow these steps:
 
-1. Initiate Emulation Script: Start by emulating data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation.py](/emulation-scripts/user_posting_emulation.py) script.
+1. **Initiate Emulation Script**: Start by emulating data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation.py](/emulation-scripts/user_posting_emulation.py) script.
+
 ```bash
 cd ../emulation-scripts
 python user_posting_emulation.py
@@ -178,7 +179,7 @@ python user_posting_emulation.py
 
 > **Note**: Allow the script to fully complete its execution. Once finished, it should have produced and sent all the records to the API Gateway, through kafka-client, MSK and MSK connect and sank the records to the S3 bucket configured in [main-storage-s3-tf](/main-storage-s3-tf/) under the 'topics' directory.
 
-2. Orchestrate Processing with Airflow: Once the data is produced and stored in S3, the next step is to process it using Airflow.
+2. **Orchestrate Processing with Airflow**: Once the data is produced and stored in S3, the next step is to process it using Airflow.
     * Navigate to **AWS Console > MWAA** and open **Airflow UI**.
     * Go to the **DAGs** tab, and locate **batch_processing_dag**.
     * Trigger the DAG manually by clicking on the **play** button on the right side of the Airflow UI.
@@ -186,7 +187,24 @@ python user_posting_emulation.py
 > **Note**: After the DAG completes its run, the processed data will be available in the S3 bucket set up by [main-storage-s3-tf](/main-storage-s3-tf/) under the '/delta_tables/transformed' directory. This data represents the transformed and processed output of the batch processing pipeline.
 
 ### Running Stream Processing Pipeline
+To execute the stream processing pipeline, you'll need to manually initiate the Databricks notebooks and run an emulation scipt. Follow these steps:
 
+1. **Initiate Stream Processing Notebooks in Databricks**: Unlike batch processing, stream processing isn't orchestrated with Airflow and needs to be manually triggered in the Databricks console.
+    * Navigate to your **Databricks Console > Workspaces**.
+    * Locate and access the workspace created by [databricks-tf](/databricks-tf/). Add your main user to this workspace and assign admin privileges. This is necessary as the workspace is initially owned by the service principal.
+    * Go to **Users** and find the service principal. You'll find the notebooks uploaded by [databricks-tf](/databricks-tf/) in the service principal's user space.
+    * Open the **kinesis_geo_data_stream_processing.ipynb**, **kinesis_pin_data_stream_processing.ipynb** and **kinesis_user_data_stream_processing.ipynb** notebooks. Run each notebook to start the stream processing.
+
+> **Note**: The streaming notebooks are configured to listen to the Kinesis data streams set up by [stream-ingestion-tf](/stream-ingestion-tf/) on the pre-configured shards.
+
+2. **Initiate Emulation Script**: Simulate data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation_streaming.py] emulation script for streaming.
+
+```bash
+cd ../emulation-scripts
+python user_posting_emulation_streaming.py
+```
+
+> **Note**: Allow the emulation script to fully complete its execution. Once finished, manually stop the streaming notebooks in Databricks. The notebooks will have processed and stored the streaming data in near-real time in the S3 bucket configured by [main-storage-s3-tf](/main-storage-s3-tf/) under the '/test_streaming_delta_tables' directory.
 
 #### References
 * [Download python](https://www.python.org/downloads/)
