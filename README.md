@@ -220,7 +220,7 @@ To execute the stream processing pipeline, you'll need to manually initiate the 
 
 > **Note**: The streaming notebooks are configured to listen to the Kinesis data streams set up by [stream-ingestion-tf](/stream-ingestion-tf/) on the pre-configured shards.
 
-2. **Initiate Emulation Script**: Simulate data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation_streaming.py](/emulation-scripts/user_posting_emulation_streaming.py) emulation script for streaming.
+3. **Initiate Emulation Script**: Simulate data production to the API Gateway. Navigate to the [emulation-scripts](/emulation-scripts/) directory and run the [user_posting_emulation_streaming.py](/emulation-scripts/user_posting_emulation_streaming.py) emulation script for streaming.
 
 ```bash
 cd ../emulation-scripts
@@ -232,9 +232,9 @@ python user_posting_emulation_streaming.py
 ### Running Queries on Processed Data
 After successfully completing the [batch processing pipeline](#running-batch-processing-pipeline), you can run queries on the processed data to extract insights or validate the transformations. Similar to the [stream processing pipeline](#running-stream-processing-pipeline), these queries are executed manually in the Databricks workspace. Follow these steps:
 
-1. **Access the Databricks Workspace**: Log in to your Databricks workspace that you set up earlier.
+1. **Access the Databricks Workspace**: Log in to your Databricks workspace that you set up earlier. If you have not run the [stream-processing pipeline](#running-stream-processing-pipeline), please follow [add user to databricks workspace wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Add-User-to-Databricks-Workspace-created-by-Service-Principal) to add user to workspace and then log in.
 
-2. **Locate the Notebook**: Navigate to the service principal's user space where you'll find the **queries.ipynb notebook**. This notebook contains predefined queries tailored to the processed data.
+2. **Locate the Notebook**: Locate the **queries.ipynb** notebook. If you have not run the [stream-processing pipeline](#running-stream-processing-pipeline) and want to locate the notebook, you can follow [find notebooks wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Finding-Notebooks-in-Databricks-Workspace) to locate the query notebook. This notebook contains predefined queries tailored to the processed data.
 
 3. **Run the Notebook**:  Open the **queries.ipynb** notebook and execute the cells. As the queries run, they will fetch and display data from the processed datasets.
 
