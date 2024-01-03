@@ -149,7 +149,7 @@ To establish the infrastructure for this project, you'll need to navigate throug
 
 3. **Stream Ingestion Setup**: 
     ```bash
-    cd ../stream-ingestion-tf
+    cd ../../stream-ingestion-tf
     terraform init
     terraform apply # Confirm with 'yes' when prompted
     ```
