@@ -29,6 +29,9 @@ This documentation outlines the usage of the project. For more detailed informat
 - [Architecture Tear Down](#architecture-tear-down)
 - [Troubleshooting](#troubleshooting)
   - [Ansible Playbook cannot connect to Kafka Client Instance](#ansible-playbook-cannot-connect-to-kafka-client-ec2-instance)
+  - [Kafka client instance cannot connect to MSK while running ansible playbook](#kafka-client-instance-cannot-connect-to-msk-cluster-while-running-ansible-playbook)
+  - [Invalid token for validation while provisioning databricks](#invalid-token-for-validation-while-provisioning-databricks)
+  - [DAG stays in running status for a while](#dag-stays-in-running-for-a-while)
 - [References](#references)
 
 ### Requirements
@@ -268,6 +271,22 @@ terraform destroy # Confirm with 'yes' when prompted
 * [ansible.tf](/batch-ingestion-tf/ansible.tf) writes the public_ip output of the kafka client ec2 instance to a **inventory** local file in [ansible](/batch-ingestion-tf/ansible/), which is read by ansible playbook to determine the public ip of the kafka client to connect. So make sure the **inventory** file exists after running **terraform apply** for [batch-ingestion-tf](/batch-ingestion-tf/). And also make sure the ip in the file matches the ip of the kafka client instance in AWS console > EC2.
 
 * Make sure in the AWS console > EC2 that somehow kafka client instance instance did not miss the inbound connection on port 22 for SSH while terraform provisioning.
+
+##### Kafka client instance cannot connect to MSK cluster while running ansible playbook
+
+* The terraform **security group rules** that allows inbound connection on kafka client from MSK security group and vice-versa sometimes gets added and removed on subsequent `terraform apply`. Therefore, if the rule is missing, run `terraform apply` again. 
+
+##### Invalid token for validation while provisioning Databricks
+
+* Make sure that the **client id** and **client secret** for the service principal you have created is correctly configured in [config.yml](/config.yml).
+
+* Make sure the service principle has **Admin** role.
+
+* Delete the existing OAuth Token and generate a new one.
+
+##### DAG stays in running for a while
+
+* The cluster in databricks is set to terminate if 20 minutes of inactivity. So, when MWAA sends API calls to run task in the cluster, the Databricks control pane takes some time to get the cluster running. So, this might add some time to the run.
 
 ### References
 * [Download python](https://www.python.org/downloads/)
