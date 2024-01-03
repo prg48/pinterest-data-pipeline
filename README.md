@@ -173,7 +173,7 @@ To establish the infrastructure for this project, you'll need to navigate throug
 
     > **Note**: MWAA might take upto 30 minutes to provision. Ensure its fully set up before proceeding.
 
-6. **MWAA Databricks Connection Setup**: After MWAA is up and running, configure the Databricks connection in Airflow:
+6. **MWAA Databricks Connection Setup**: After MWAA is up and running, configure databricks conneciton in Airflow by following the [databricks connection wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Adding-Databricks-connection-in-MWAA-Airflow) or the following steps:
 
     * Navigate to **AWS Console > MWAA** and open **Airflow UI**.
     * In **Admin > Connections**, locate and edit the **databricks_default** connection.
