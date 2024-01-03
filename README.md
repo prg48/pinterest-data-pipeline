@@ -208,9 +208,11 @@ python user_posting_emulation.py
 ### Running Stream Processing Pipeline
 To execute the stream processing pipeline, you'll need to manually initiate the Databricks notebooks and run an emulation scipt. Follow these steps:
 
-1. **Initiate Stream Processing Notebooks in Databricks**: Unlike batch processing, stream processing isn't orchestrated with Airflow and needs to be manually triggered in the Databricks console.
+1. **Initiate Stream Processing Notebooks in Databricks**: Unlike batch processing, stream processing isn't orchestrated with Airflow and needs to be manually triggered in the Databricks console. For this, you will have to add your user to the workspace as the workspace is owned by Service Principal that provisioned the workspace. To do this, either follow the [add user to databricks workspace wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Add-User-to-Databricks-Workspace-created-by-Service-Principal) or the following steps:
     * Navigate to your **Databricks Console > Workspaces**.
-    * Locate and access the workspace created by [databricks-tf](/databricks-tf/). Add your main user to this workspace and assign admin privileges. This is necessary as the workspace is initially owned by the service principal.
+    * Click on the workspace created by [databricks-tf](/databricks-tf/)(Service Principal).
+    * Locate **Add permissions** and click on it.
+    * In the Add permissions overlay, enter your user for **User, group, or service principal** and **Admin** for permissions and save it.
     * Log in to the workspace, go to **Users** and find the service principal. You'll find the notebooks uploaded by [databricks-tf](/databricks-tf/) in the service principal's user space.
     * Open the **kinesis_geo_data_stream_processing.ipynb**, **kinesis_pin_data_stream_processing.ipynb** and **kinesis_user_data_stream_processing.ipynb** notebooks. Run each notebook to start the stream processing.
 
