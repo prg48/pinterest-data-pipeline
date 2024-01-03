@@ -213,7 +213,9 @@ To execute the stream processing pipeline, you'll need to manually initiate the 
     * Click on the workspace created by [databricks-tf](/databricks-tf/)(Service Principal).
     * Locate **Add permissions** and click on it.
     * In the Add permissions overlay, enter your user for **User, group, or service principal** and **Admin** for permissions and save it.
-    * Log in to the workspace, go to **Users** and find the service principal. You'll find the notebooks uploaded by [databricks-tf](/databricks-tf/) in the service principal's user space.
+    * Log in to the workspace with your user credentials.
+    
+2. **Run the streaming Notebooks**: The notebooks were uploaded by the service principal. Therefore, it won't be available in the User's space. To find the notebooks in the workspace, you can follow the [find notebooks wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Finding-Notebooks-in-Databricks-Workspace) or go to **Users** and locate the service principal, then follow the following step:
     * Open the **kinesis_geo_data_stream_processing.ipynb**, **kinesis_pin_data_stream_processing.ipynb** and **kinesis_user_data_stream_processing.ipynb** notebooks. Run each notebook to start the stream processing.
 
 > **Note**: The streaming notebooks are configured to listen to the Kinesis data streams set up by [stream-ingestion-tf](/stream-ingestion-tf/) on the pre-configured shards.
