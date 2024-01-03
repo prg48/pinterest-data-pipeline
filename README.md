@@ -141,7 +141,9 @@ To establish the infrastructure for this project, you'll need to navigate throug
      > **Note**: MSK might take upto 30 minutes to provision. Ensure its fully set up before proceeding.
 
     ```bash
-    cd ansible
+    cd kafka-client-key-pairs
+    chmod 400 kafka-client-key-pair.pem # provide sufficient permission to kafka client ssh key for ansible to connect
+    cd ../ansible
     ansible-playbook kafka-client-setup.yml
     ```
 
