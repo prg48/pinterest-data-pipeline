@@ -237,7 +237,7 @@ After successfully completing the [batch processing pipeline](#running-batch-pro
 > **Note**: The results from these queries are displayed directly in the notebook and are not stored elsewhere.
 
 ### Architecture Tear Down
-When you no longer need the infrastructure set up for this project, you can decommission it to avoid incurring unnecessary costs. To tear down the architecture, navigate to each of the terraform directories apply the following command:
+When you no longer need the infrastructure set up for this project, you can decommission it to avoid incurring unnecessary costs. To tear down the architecture, navigate to each of the terraform directories apply **terraform destroy** as follows:
 
 ```bash
 cd batch-ingestion-tf 
