@@ -27,6 +27,8 @@ This documentation outlines the usage of the project. For more detailed informat
 - [Running Stream Processing Pipeline](#running-stream-processing-pipeline)
 - [Running Queries on Processed Data](#running-queries-on-processed-data)
 - [Architecture Tear Down](#architecture-tear-down)
+- [Troubleshooting](#troubleshooting)
+  - [Ansible Playbook cannot connect to Kafka Client Instance](#ansible-playbook-cannot-connect-to-kafka-client-ec2-instance)
 - [References](#references)
 
 ### Requirements
@@ -257,6 +259,15 @@ terraform destroy # Confirm with 'yes' when prompted
 ```
 
 > **Note**: Cloudwatch logs for MWAA must be deleted manually by navigating to AWS console and the KMS key used by MSK has deletion window of 7 days. Therefore, it will take 7 days before permanent deletetion.
+
+### Troubleshooting
+
+##### Ansible playbook cannot connect to kafka client ec2 instance
+* Ansible playbook uses private key from [kafka-client-key-pairs](/batch-ingestion-tf/kafka-client-key-pairs/) to connect to the kafka client ec2 instance. So make sure that you've given necessary permission to the private key with `chmod 400 kafka-client-key-pair.pem`.
+
+* [ansible.tf](/batch-ingestion-tf/ansible.tf) writes the public_ip output of the kafka client ec2 instance to a **inventory** local file in [ansible](/batch-ingestion-tf/ansible/), which is read by ansible playbook to determine the public ip of the kafka client to connect. So make sure the **inventory** file exists after running **terraform apply** for [batch-ingestion-tf](/batch-ingestion-tf/). And also make sure the ip in the file matches the ip of the kafka client instance in AWS console > EC2.
+
+* Make sure in the AWS console > EC2 that somehow kafka client instance instance did not miss the inbound connection on port 22 for SSH while terraform provisioning.
 
 ### References
 * [Download python](https://www.python.org/downloads/)
