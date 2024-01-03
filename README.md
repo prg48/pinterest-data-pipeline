@@ -240,6 +240,15 @@ After successfully completing the [batch processing pipeline](#running-batch-pro
 When you no longer need the infrastructure set up for this project, you can decommission it to avoid incurring unnecessary costs. To tear down the architecture, navigate to each of the terraform directories apply the following command:
 
 ```bash
+cd batch-ingestion-tf 
+terraform destroy # Confirm with 'yes' when prompted
+cd ../databricks-tf
+terraform destroy # Confirm with 'yes' when prompted
+cd ../stream-ingestion-tf
+terraform destroy # Confirm with 'yes' when prompted
+cd ../mwaa-orchestration-tf
+terraform destroy # Confirm with 'yes' when prompted
+cd ../main-storage-s3-tf
 terraform destroy # Confirm with 'yes' when prompted
 ```
 
