@@ -89,7 +89,7 @@ To interact with AWS services, you'll need to [set up access keys](https://www.y
 
 To automate interactions with Databricks for provisioning workspaces and clusters via Terraform, you'll need a [service principal](https://docs.databricks.com/en/dev-tools/service-principals.html) and your [databricks account ID](https://docs.databricks.com/en/administration-guide/account-settings/index.html#locate-your-account-id).
 
-1. **Creating a Service Principal**: A service principal allows you to automate Databricks API interactions through IaC tools like Terraform. You can follow the [service principal wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Setting-up-databricks-service-principal-with-OAuth-authentication) or the following streps to create one:
+1. **Creating a Service Principal**: A service principal allows you to automate Databricks API interactions through IaC tools like Terraform. You can follow the [service principal wiki](https://github.com/prg48/pinterest-data-pipeline/wiki/Setting-up-databricks-service-principal-with-OAuth-authentication) or the following steps to create one:
     * Navigate to the **User management** tab in your Databricks account.
     * Select the **Service principals** tab, then click the **Add service principal** button and provide a name for it.
     * After creation, click on the service principal's name. Under the **Roles** tab, assign the **Account admin** role.
